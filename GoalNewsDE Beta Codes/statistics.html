@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoalNewsDE – Teamstatistiken</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: #fff;
+            color: #111;
+            text-align: center;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark {
+            background: #111;
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 6vw;
+            margin: 20px 0;
+            background: linear-gradient(90deg, #1db954, #00d4ff, #1db954);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #themeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1db954;
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        #themeToggle:hover {
+            transform: scale(1.1);
+        }
+
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .team {
+            background: #e8f5e9;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark .team {
+            background: #222;
+        }
+
+        .team:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px #1db954, 0 0 25px #00d4ff;
+        }
+
+        .team-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .team-stats {
+            font-size: 0.9rem;
+        }
+
+        .bar-container {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0;
+            border-radius: 10px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .scorer-box {
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #e8f5e9;
+            text-align: left;
+            color: #111;
+            transition: background 0.3s;
+        }
+
+        body.dark .scorer-box {
+            background: #222;
+            color: #fff;
+        }
+
+        .scorer-box h2 {
+            text-align: center;
+            background: linear-gradient(90deg, #1db954, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .scorer-list li {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+
+        .scorer-list li:hover {
+            background: rgba(29, 185, 84, 0.3);
+        }
+
+        .scorer-list .points {
+            font-weight: bold;
+            color: #1db954;
+        }
+
+        .back-btn {
+            background: #1db954;
+            color: #fff;
+            height: 50px;
+            width: 90%;
+            max-width: 180px;
+            font-size: 1rem;
+            border-radius: 25px;
+            margin: 15px auto;
+            display: block;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            box-shadow: 0 0 15px #1db954, 0 0 25px #00d4ff;
+            transform: scale(1.05);
+        }
+
+        @media(max-width:768px) {
+            h1 {
+                font-size: 8vw;
+            }
+
+            .team-name {
+                font-size: 1.1rem;
+            }
+
+            .team-stats {
+                font-size: 0.85rem;
+            }
+
+            .bar-container {
+                height: 18px;
+            }
+
+            .team {
+                height: 180px;
+            }
+        }
+
+        @media(max-width:480px) {
+            h1 {
+                font-size: 12vw;
+            }
+
+            .team-name {
+                font-size: 0.95rem;
+            }
+
+            .team-stats {
+                font-size: 0.8rem;
+            }
+
+            .bar-container {
+                height: 14px;
+            }
+
+            .team {
+                height: 160px;
+            }
+
+            .stats-dashboard {
+                gap: 10px;
+                padding: 0 10px;
+            }
+        }
+
+        @keyframes pop {
+          0% { transform: scale(0); opacity: 0; }
+          50% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(1); }
+  }
+    </style>
+</head>
+
+<body>
+
+    <h1>Bundesliga 25/26 – Teamstatistiken</h1>
+    <button id="themeToggle">🌙</button>
+
+    <div class="stats-dashboard">
+        <div class="team">
+            <div class="team-name">1. Bayern München</div>
+            <div class="team-stats">6 Spiele | 25:3 Tore | 18 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="18" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">2. Borussia Dortmund</div>
+            <div class="team-stats">6 Spiele | 12:4 Tore | 14 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="14" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">3. RB Leipzig</div>
+            <div class="team-stats">6 Spiele | 8:8 Tore | 13 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="13" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">4. VfB Stuttgart</div>
+            <div class="team-stats">6 Spiele | 8:6 Tore | 12 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="12" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">5. Bayer Leverkusen</div>
+            <div class="team-stats">6 Spiele | 12:8 Tore | 11 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="11" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">6. 1. FC Köln</div>
+            <div class="team-stats">6 Spiele | 11:9 Tore | 10 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="10" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">7. Eintracht Frankfurt</div>
+            <div class="team-stats">6 Spiele | 17:16 Tore | 9 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="9" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">8. SC Freiburg</div>
+            <div class="team-stats">6 Spiele | 9:9 Tore | 8 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="8" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">9. Hamburger SV</div>
+            <div class="team-stats">6 Spiele | 6:8 Tore | 8 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="8" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">10. FC St. Pauli</div>
+            <div class="team-stats">6 Spiele | 8:9 Tore | 7 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="7" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">11. TSG Hoffenheim</div>
+            <div class="team-stats">6 Spiele | 9:12 Tore | 7 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="7" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">12. Werder Bremen</div>
+            <div class="team-stats">6 Spiele | 9:14 Tore | 7 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="7" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">13. 1. FC Union Berlin</div>
+            <div class="team-stats">6 Spiele | 8:13 Tore | 7 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="7" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">14. FC Augsburg</div>
+            <div class="team-stats">6 Spiele | 11:13 Tore | 6 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="6" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">15. VfL Wolfsburg</div>
+            <div class="team-stats">6 Spiele | 8:10 Tore | 5 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="5" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">16. 1. FSV Mainz 05</div>
+            <div class="team-stats">6 Spiele | 5:10 Tore | 4 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="4" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">17. Borussia Mönchengladbach</div>
+            <div class="team-stats">6 Spiele | 5:12 Tore | 3 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="3" data-max="18"></div>
+            </div>
+        </div>
+        <div class="team">
+            <div class="team-name">18. 1. FC Heidenheim</div>
+            <div class="team-stats">6 Spiele | 4:11 Tore | 3 Punkte</div>
+            <div class="bar-container">
+                <div class="bar" data-points="3" data-max="18"></div>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="scorer-box" style="background:#111; color:#fff; box-shadow:0 0 25px #ffd700,0 0 50px #ffea00;">
+      <h2 style="background: linear-gradient(90deg,#ffd700,#ffea00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size:2rem; text-align:center; text-shadow:0 0 10px #ffd700,0 0 20px #ffea00;">
+         Teuerster Spieler
+      </h2>
+      <ol class="scorer-list" style="list-style:none; padding:0; margin:20px 0;">
+        <li style="padding:15px; margin:10px 0; border-radius:15px; background:linear-gradient(90deg,#ffd700,#ffea00); color:#111; font-weight:bold; font-size:1.5rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 0 15px #ffd700,0 0 30px #ffea00; transform:scale(0); animation: pop 0.8s forwards;">
+          <a href="lamine yamal.html">Lamine Yamal</a> <span style="font-size:1.5rem;">€200M</span>
+        </li>
+      </ol>
+    </div>
+
+    
+
+    <div class="scorer-box">
+        <h2>Bundesliga Top Scorer</h2>
+        <ol class="scorer-list">
+            <li>Harry Kane (FC Bayern)<span class="points">16</span></li>
+            <li>Luis Díaz (FC Bayern)<span class="points">9</span></li>
+            <li>Can Uzun (Eintracht Frankfurt)<span class="points">8</span></li>
+            <li>Michael Olise (FC Bayern)<span class="points">7</span></li>
+            <li>Serge Gnabry (FC Bayern)<span class="points">6</span></li>
+            <li>Alejandro Grimaldo (Bayer Leverkusen)<span class="points">6</span></li>
+            <li>Ilyas Ansah (Union Berlin)<span class="points">5</span></li>
+            <li>Fisnik Asllani (TSG Hoffenheim)<span class="points">5</span></li>
+            <li>Christoph Baumgartner (RB Leipzig)<span class="points">5</span></li>
+            <li>Marius Bülter (FC Köln)<span class="points">5</span></li>
+        </ol>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">Zur Hauptseite</button>
+
+    <script>
+        // Dark Mode Toggle
+        const toggle = document.getElementById('themeToggle');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            toggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        });
+
+        // Animate Bars
+        window.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".bar").forEach(bar => {
+                const points = parseInt(bar.dataset.points);
+                const max = parseInt(bar.dataset.max);
+                const percent = (points / max) * 100;
+                setTimeout(() => { bar.style.width = percent + "%"; }, 100);
+                if (points >= 14) { bar.style.background = "linear-gradient(90deg,#1db954,#00d4ff)"; }
+                else if (points >= 8) { bar.style.background = "linear-gradient(90deg,#f5d742,#f59e42)"; }
+                else { bar.style.background = "linear-gradient(90deg,#ff4c4c,#ff0000)"; }
+            });
+        });
+    </script>
+
+  <script src="beta-banner.js"></script>
+</body>
+
+</html>

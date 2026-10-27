@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080f1b">
+  <meta name="description" content="Spielplan, Ergebnisse und Updates zu deinem Lieblingsverein bei GoalNews.">
+  <title>Mein Verein · Updates – GoalNews</title>
+  <link rel="stylesheet" href="ligatabelle.css">
+  <style>
+    .notice { margin: 0 0 22px; padding: 18px 20px; border: 1px solid #c8f27930; border-radius: 16px; background: #c8f2790b; color: #cbd5e1; line-height: 1.6; }
+    .notice strong { color: #e3ffad; }
+    .match-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; padding: 16px; }
+    .match-card { padding: 16px; border: 1px solid #ffffff14; border-radius: 13px; background: #ffffff05; }
+    .match-meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; color: #a5b2c4; font-size: .78rem; }
+    .match-teams { font-size: 1rem; font-weight: 700; line-height: 1.5; }
+    .match-score { margin-top: 8px; color: #e3ffad; font-size: 1.2rem; font-weight: 800; }
+    .empty { grid-column: 1/-1; padding: 18px; color: #aebcd0; text-align: center; }
+    .auth-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+    @media (max-width:650px) { .match-meta { flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Goal<span>News</span></a>
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      <a href="index.html">Startseite</a>
+      <a href="verein-news.html" aria-current="page">Mein Verein</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <div><p class="eyebrow">Dein Team im Blick</p><h1 id="pageTitle">Vereins-Updates</h1><p class="season" id="intro">Spielplan, Ergebnisse und Spielstände aus der aktuellen Saison.</p></div>
+      <button class="refresh" id="refreshButton" type="button">Daten neu laden</button>
+    </section>
+    <div class="notice" id="status" role="status" aria-live="polite">Deine Vereinsdaten werden geladen …</div>
+    <section class="panel" aria-labelledby="upcomingHeading">
+      <div class="panel-head"><h2 id="upcomingHeading">Kommende Spiele</h2><span class="updated" id="upcomingCount"></span></div>
+      <div class="match-list" id="upcoming"><p class="empty">Spielplan wird geladen …</p></div>
+    </section>
+    <section class="panel" style="margin-top:20px" aria-labelledby="recentHeading">
+      <div class="panel-head"><h2 id="recentHeading">Letzte Ergebnisse</h2><span class="updated" id="resultsCount"></span></div>
+      <div class="match-list" id="results"><p class="empty">Ergebnisse werden geladen …</p></div>
+    </section>
+    <p class="form-note" style="margin-top:16px"><span class="dot"></span>Die OpenLigaDB-Daten werden im Browser zwischengespeichert und nur bei Bedarf neu abgerufen.</p>
+  </main>
+  <footer class="footer">Spielplandaten: <a href="https://www.openligadb.de/" target="_blank" rel="noopener noreferrer">OpenLigaDB</a> · <a href="https://www.openligadb.de/lizenz" target="_blank" rel="noopener noreferrer">ODbL 1.0</a></footer>
+  <script type="module">
+    import { fetchJsonCached, currentSeasonStart, formatUpdatedAt } from "./data-cache.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+      authDomain: "goalnewsde-community.firebaseapp.com",
+      projectId: "goalnewsde-community",
+      storageBucket: "goalnewsde-community.firebasestorage.app",
+      messagingSenderId: "134523022055",
+      appId: "1:134523022055:web:4f35ed7812d06e4fb55042",
+    };
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const auth = getAuth();
+    setPersistence(auth, browserLocalPersistence);
+    const statusEl = document.getElementById("status");
+    const titleEl = document.getElementById("pageTitle");
+    const introEl = document.getElementById("intro");
+    const upcomingEl = document.getElementById("upcoming");
+    const resultsEl = document.getElementById("results");
+    const refreshButton = document.getElementById("refreshButton");
+    let currentTeam = "";
+
+    function normalized(value) {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^a-z0-9]/g, "");
+    }
+    function showEmpty(container, text) {
+      container.replaceChildren();
+      const p = document.createElement("p"); p.className = "empty"; p.textContent = text; container.append(p);
+    }
+    function dateText(date) {
+      return new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
+    }
+    function renderMatch(match, isPlayed) {
+      const card = document.createElement("article"); card.className = "match-card";
+      const meta = document.createElement("div"); meta.className = "match-meta";
+      const date = new Date(match.matchDateTime);
+      const league = match.leagueName || match.league?.leagueName || "Liga";
+      meta.textContent = `${league} · ${dateText(date)}`;
+      const teams = document.createElement("div"); teams.className = "match-teams";
+      teams.textContent = `${match.team1?.teamName || "Heim"} – ${match.team2?.teamName || "Gast"}`;
+      card.append(meta, teams);
+      if (isPlayed) {
+        const score = match.matchResults?.find(item => item.resultTypeID === 2) || match.matchResults?.[match.matchResults.length - 1];
+        const result = document.createElement("div"); result.className = "match-score";
+        result.textContent = score ? `${score.pointsTeam1} : ${score.pointsTeam2}` : "Ergebnis noch nicht verfügbar";
+        card.append(result);
+      }
+      return card;
+    }
+    async function loadTeamMatches(team) {
+      statusEl.textContent = "Spielplan und Ergebnisse werden geladen …";
+      refreshButton.disabled = true;
+      try {
+        const season = currentSeasonStart();
+        const responses = await Promise.all(["bl1", "bl2"].map(league => fetchJsonCached(`https://api.openligadb.de/getmatchdata/${league}/${season}`, { ttlMs: 5 * 60 * 1000 })));
+        const all = responses.flatMap(response => response.data);
+        const key = normalized(team);
+        const matches = all.filter(match => normalized(match.team1?.teamName).includes(key) || normalized(match.team2?.teamName).includes(key));
+        const now = Date.now();
+        const upcoming = matches.filter(match => new Date(match.matchDateTime).getTime() >= now).sort((a,b) => new Date(a.matchDateTime)-new Date(b.matchDateTime)).slice(0, 6);
+        const results = matches.filter(match => new Date(match.matchDateTime).getTime() < now && (match.matchIsFinished || match.matchResults?.length)).sort((a,b) => new Date(b.matchDateTime)-new Date(a.matchDateTime)).slice(0, 6);
+        titleEl.textContent = `${team} · Updates`;
+        introEl.textContent = `Kommende Partien und die jüngsten Ergebnisse von ${team} in Bundesliga und 2. Bundesliga.`;
+        document.getElementById("upcomingCount").textContent = `${upcoming.length} angezeigt`;
+        document.getElementById("resultsCount").textContent = `${results.length} angezeigt`;
+        upcoming.length ? upcomingEl.replaceChildren(...upcoming.map(match => renderMatch(match, false))) : showEmpty(upcomingEl, `Für ${team} sind aktuell keine kommenden Spiele gelistet.`);
+        results.length ? resultsEl.replaceChildren(...results.map(match => renderMatch(match, true))) : showEmpty(resultsEl, `Für ${team} liegen in dieser Saison noch keine Ergebnisse vor.`);
+        const updatedAt = Math.min(...responses.map(response => response.updatedAt));
+        const stale = responses.some(response => response.stale);
+        statusEl.textContent = `Datenstand: ${formatUpdatedAt(updatedAt)}${stale ? " · gespeicherter Stand (API gerade nicht erreichbar)" : ""}.`;
+      } catch (error) {
+        console.error("OpenLigaDB-Daten konnten nicht geladen werden:", error);
+        statusEl.textContent = "Die Spieldaten sind gerade nicht erreichbar. Bitte versuche es später erneut.";
+        showEmpty(upcomingEl, "Spielplan momentan nicht verfügbar."); showEmpty(resultsEl, "Ergebnisse momentan nicht verfügbar.");
+      } finally { refreshButton.disabled = false; }
+    }
+    refreshButton.addEventListener("click", () => currentTeam && loadTeamMatches(currentTeam));
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        statusEl.replaceChildren(document.createTextNode("Melde dich an, damit wir den in deinem Profil gespeicherten Lieblingsverein anzeigen können. "));
+        const actions = document.createElement("span"); actions.className = "auth-actions";
+        const login = document.createElement("a"); login.href = "login.html"; login.textContent = "Anmelden";
+        const register = document.createElement("a"); register.href = "register.html"; register.textContent = "Konto erstellen";
+        actions.append(login, register); statusEl.append(actions);
+        showEmpty(upcomingEl, "Nach der Anmeldung erscheinen hier die nächsten Spiele deines Vereins.");
+        showEmpty(resultsEl, "Nach der Anmeldung erscheinen hier die letzten Ergebnisse.");
+        return;
+      }
+      try {
+        const snapshot = await getDoc(doc(db, "users", user.uid));
+        currentTeam = String(snapshot.data()?.favTeam || "").trim();
+        if (!currentTeam) {
+          statusEl.textContent = "In deinem Profil ist noch kein Lieblingsverein gespeichert. Lege ihn im Dashboard fest.";
+          const link = document.createElement("a"); link.href = "special.html"; link.textContent = "Zum Dashboard"; statusEl.append(" ", link);
+          showEmpty(upcomingEl, "Wähle zuerst deinen Lieblingsverein aus."); showEmpty(resultsEl, "Wähle zuerst deinen Lieblingsverein aus.");
+          return;
+        }
+        await loadTeamMatches(currentTeam);
+      } catch (error) {
+        console.error("Profil konnte nicht geladen werden:", error);
+        statusEl.textContent = "Dein Profil konnte gerade nicht geladen werden. Bitte lade die Seite später erneut.";
+      }
+    });
+  </script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>

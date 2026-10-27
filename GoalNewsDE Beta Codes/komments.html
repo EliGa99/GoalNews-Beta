@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <title>Kommentarforum – GoalNews</title>
+  <link rel="stylesheet" href="ligatabelle.css">
+  <style>
+    .forum-hero { padding:clamp(24px,5vw,46px); border:1px solid #ffffff18; border-radius:22px; background:radial-gradient(ellipse at 90% 0,#314c2877,transparent 45%),linear-gradient(135deg,#172638,#101a29); }
+    .forum-hero h1 { font-size:clamp(2rem,6vw,3.3rem); }
+    .forum-hero p:last-child { max-width:650px; margin:14px 0 0; color:#aebcd0; line-height:1.65; }
+    .forum-layout { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr); gap:18px; align-items:start; margin-top:22px; }
+    .forum-panel { overflow:hidden; border:1px solid #ffffff16; border-radius:17px; background:#111b2a; box-shadow:0 18px 45px #0003; }
+    .panel-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 19px; border-bottom:1px solid #ffffff12; }
+    .panel-heading h2 { margin:0; font-size:1.05rem; }
+    .comment-box { padding:18px; }
+    .comment-box textarea { display:block; width:100%; min-height:130px; padding:14px; resize:vertical; border:1px solid #ffffff20; border-radius:12px; outline:none; background:#091321; color:#f5f8fc; font:inherit; line-height:1.5; }
+    .comment-box textarea::placeholder { color:#8391a2; }
+    .comment-box textarea:focus { border-color:#c8f279; box-shadow:0 0 0 4px #c8f2791c; }
+    .comment-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; }
+    .auth-hint { color:#92a1b4; font-size:.8rem; line-height:1.5; }
+    .auth-hint a, .panel-link { color:#c8f279; font-weight:750; text-decoration:none; }
+    .auth-hint a:hover, .panel-link:hover { text-decoration:underline; }
+    #sendComment { min-height:44px; padding:0 17px; border:0; border-radius:10px; background:#c8f279; color:#102013; font:inherit; font-weight:800; cursor:pointer; }
+    #sendComment:hover:not(:disabled) { filter:brightness(1.06); }
+    #sendComment:disabled { opacity:.45; cursor:not-allowed; }
+    #commentsContainer { display:grid; gap:11px; padding:14px; }
+    .comment { position:relative; padding:15px; border:1px solid #ffffff12; border-radius:13px; background:#ffffff05; overflow-wrap:anywhere; }
+    .comment-head { display:flex; align-items:center; gap:10px; padding-right:34px; }
+    .comment-avatar { display:grid; flex:0 0 36px; width:36px; height:36px; place-items:center; border-radius:50%; background:#c8f27920; color:#d8ff91; font-weight:850; }
+    .comment-author { color:#e6edf6; font-size:.86rem; font-weight:750; }
+    .comment-date { display:block; margin-top:2px; color:#8595a9; font-size:.72rem; }
+    .comment-text { margin:13px 0; color:#d2dce8; line-height:1.6; white-space:pre-wrap; }
+    .comment-tools { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .reaction-bar { display:flex; gap:6px; flex-wrap:wrap; }
+    .reaction-bar span { padding:4px 8px; border:1px solid #ffffff14; border-radius:999px; background:#ffffff07; color:#cad5e2; font-size:.78rem; }
+    .react-btn { padding:6px 9px; border:1px solid #ffffff19; border-radius:8px; background:#ffffff07; color:#c8f279; font:inherit; font-size:.78rem; cursor:pointer; }
+    .delete-btn { position:absolute; top:12px; right:12px; padding:5px 7px; border:0; border-radius:7px; background:#ff6b6b16; color:#ff9e9e; cursor:pointer; }
+    .reaction-popup { position:fixed; z-index:100; display:flex; gap:6px; padding:8px; border:1px solid #ffffff20; border-radius:13px; background:#101b29; box-shadow:0 12px 35px #0008; }
+    .reaction-popup button { padding:5px 7px; border:0; border-radius:8px; background:#ffffff0b; font-size:1.1rem; cursor:pointer; }
+    .reaction-popup button:hover { background:#c8f27920; }
+    .forum-side { padding:18px; }
+    .forum-side h2 { margin:0 0 10px; font-size:1rem; }
+    .forum-side p { margin:0 0 16px; color:#9eacc0; font-size:.86rem; line-height:1.6; }
+    .forum-side .panel-link { display:inline-flex; padding:9px 12px; border:1px solid #c8f27945; border-radius:9px; }
+    .empty-comments { padding:25px 14px; color:#91a0b4; text-align:center; }
+    @media(max-width:760px) { .forum-layout { grid-template-columns:1fr; } }
+    @media(max-width:480px) { .comment-actions { align-items:stretch; flex-direction:column; } #sendComment { width:100%; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Goal<span>News</span></a>
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      <a href="index.html">Startseite</a>
+      <a href="bewertungen.html">Bewertungen</a>
+      <a href="special.html">Dashboard</a>
+    </nav>
+  </header>
+  <main>
+    <section class="forum-hero">
+      <p class="eyebrow">Austausch unter Fußballfans</p>
+      <h1>Kommentarforum</h1>
+      <p>Diskutiere Spieltage, Teams und Fußballthemen mit der Community. Kommentare schreiben können angemeldete Mitglieder.</p>
+    </section>
+    <div class="forum-layout">
+      <section class="forum-panel" aria-labelledby="feedHeading">
+        <div class="panel-heading"><h2 id="feedHeading">Community-Diskussion</h2><span class="updated">Live aktualisiert</span></div>
+        <div class="comment-box">
+          <textarea id="commentInput" placeholder="Was möchtest du mit der Community teilen?" rows="4" maxlength="1000" disabled></textarea>
+          <div class="comment-actions">
+            <span class="auth-hint" id="authHint">Zum Schreiben bitte <a href="login.html">anmelden</a>.</span>
+            <button id="sendComment" type="button" disabled>Kommentar posten</button>
+          </div>
+        </div>
+        <div id="commentsContainer" aria-live="polite"><p class="empty-comments">Kommentare werden geladen …</p></div>
+      </section>
+      <aside class="forum-panel forum-side">
+        <h2>Wie findest du GoalNews?</h2>
+        <p>Gib der Seite eine Sternebewertung. Du kannst optional einen kurzen Kommentar hinzufügen. Bewerten können nur angemeldete Mitglieder.</p>
+        <a class="panel-link" href="bewertungen.html">⭐ Zur Bewertungsseite</a>
+      </aside>
+    </div>
+  </main>
+  <footer class="footer"><a href="index.html">Zurück zur Startseite</a></footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+      authDomain: "goalnewsde-community.firebaseapp.com",
+      projectId: "goalnewsde-community",
+      storageBucket: "goalnewsde-community.firebasestorage.app",
+      messagingSenderId: "134523022055",
+      appId: "1:134523022055:web:4f35ed7812d06e4fb55042"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const commentInput = document.getElementById("commentInput");
+    const sendComment = document.getElementById("sendComment");
+    const commentsContainer = document.getElementById("commentsContainer");
+    const authHint = document.getElementById("authHint");
+
+    sendComment.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const text = commentInput.value.trim();
+      if (!text) return;
+      sendComment.disabled = true;
+      try {
+        let username = user.displayName || "GoalNews-Mitglied";
+        try {
+          const profile = await getDoc(doc(db, "users", user.uid));
+          if (profile.exists() && profile.data().username) username = String(profile.data().username).slice(0, 40);
+        } catch { /* Der Kommentar kann auch ohne Profilnamen gespeichert werden. */ }
+        username = String(username).trim().slice(0, 40) || "GoalNews-Mitglied";
+        await addDoc(collection(db, "comments"), { userId:user.uid, username, text, created:serverTimestamp(), reactions:{} });
+        commentInput.value = "";
+      } catch (error) {
+        console.error("Kommentar konnte nicht gespeichert werden:", error);
+        authHint.textContent = "Kommentar konnte gerade nicht gespeichert werden. Bitte später erneut versuchen.";
+      } finally {
+        sendComment.disabled = !auth.currentUser;
+      }
+    });
+
+    function formatDate(timestamp) {
+      if (!timestamp?.toDate) return "Gerade eben";
+      return timestamp.toDate().toLocaleString("de-DE", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
+    }
+
+    async function renderComments(snapshot) {
+      if (snapshot.empty) {
+        const empty = document.createElement("p");
+        empty.className = "empty-comments";
+        empty.textContent = "Noch keine Kommentare – starte die Diskussion!";
+        commentsContainer.replaceChildren(empty);
+        return;
+      }
+      const user = auth.currentUser;
+      const cards = await Promise.all(snapshot.docs.map(async commentDoc => {
+        const data = commentDoc.data();
+        const card = document.createElement("article");
+        card.className = "comment";
+        const username = typeof data.username === "string" && data.username.trim()
+          ? data.username.trim().slice(0, 40)
+          : "GoalNews-Mitglied";
+
+        const head = document.createElement("div");
+        head.className = "comment-head";
+        const avatar = document.createElement("span");
+        avatar.className = "comment-avatar";
+        avatar.textContent = (username.trim()[0] || "G").toLocaleUpperCase("de");
+        const identity = document.createElement("div");
+        const author = document.createElement("span");
+        author.className = "comment-author";
+        author.textContent = username;
+        const date = document.createElement("time");
+        date.className = "comment-date";
+        date.textContent = formatDate(data.created);
+        identity.append(author, date);
+        head.append(avatar, identity);
+
+        const message = document.createElement("p");
+        message.className = "comment-text";
+        message.textContent = data.text || "";
+        const reactions = document.createElement("div");
+        reactions.className = "reaction-bar";
+        Object.entries(data.reactions || {}).forEach(([emoji, count]) => {
+          if (!count) return;
+          const badge = document.createElement("span");
+          badge.textContent = `${emoji} ${count}`;
+          reactions.appendChild(badge);
+        });
+        const tools = document.createElement("div");
+        tools.className = "comment-tools";
+        const reactButton = document.createElement("button");
+        reactButton.type = "button";
+        reactButton.className = "react-btn";
+        reactButton.textContent = "Reaktionen pausiert";
+        reactButton.disabled = true;
+        reactButton.title = "Reaktionen sind vorübergehend deaktiviert, damit Zähler nicht manipuliert werden können.";
+        tools.append(reactions, reactButton);
+        card.append(head, message, tools);
+
+        if (user && data.userId === user.uid) {
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "delete-btn";
+          remove.textContent = "Löschen";
+          remove.setAttribute("aria-label", "Eigenen Kommentar löschen");
+          remove.addEventListener("click", async () => {
+            if (confirm("Kommentar wirklich löschen?")) await deleteDoc(doc(db, "comments", commentDoc.id));
+          });
+          card.appendChild(remove);
+        }
+        return card;
+      }));
+      commentsContainer.replaceChildren(...cards);
+    }
+
+    const commentsQuery = query(collection(db, "comments"), orderBy("created", "desc"));
+    onSnapshot(commentsQuery, snapshot => renderComments(snapshot), error => {
+      console.error("Kommentare konnten nicht geladen werden:", error);
+      commentsContainer.textContent = "Kommentare sind gerade nicht erreichbar.";
+    });
+    onAuthStateChanged(auth, user => {
+      commentInput.disabled = !user;
+      sendComment.disabled = !user;
+      authHint.replaceChildren();
+      authHint.append(document.createTextNode(user ? "Du bist angemeldet und kannst kommentieren." : "Zum Schreiben bitte "));
+      if (!user) {
+        const login = document.createElement("a");
+        login.href = "login.html";
+        login.textContent = "anmelden";
+        authHint.append(login, document.createTextNode("."));
+      }
+    });
+  </script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>

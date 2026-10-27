@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gesperrt</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Share Tech Mono', monospace;
+    background: radial-gradient(circle at center, #000000, #111111);
+    color: #00ff00;
+    overflow: hidden;
+  }
+
+  .matrix {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .matrix span {
+    display: block;
+    position: absolute;
+    bottom: 100%;
+    font-size: 16px;
+    animation: fall 3s linear infinite;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(110vh); opacity: 0; }
+  }
+
+  .ban-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+    padding: 40px;
+    border: 2px solid #00ff00;
+    border-radius: 15px;
+    box-shadow: 0 0 30px #00ff00;
+  }
+
+  .ban-message h1 {
+    font-size: 3em;
+    margin: 0 0 20px 0;
+    color: #ff0000;
+    text-shadow: 0 0 10px red;
+  }
+
+  .ban-message p {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #00ff00;
+  }
+
+  .ban-message .subtext {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="matrix" id="matrix"></div>
+
+<div class="ban-message">
+  <h1>SERVER BANNUNG</h1>
+  <p>Dein Konto wurde von unserem System gebannt.</p>
+  <p>Falls dies ein Fehler ist, kontaktiere den Administrator.</p>
+  <div class="subtext">– GoalNewsDE Security System –</div>
+</div>
+
+<script>
+  const matrix = document.getElementById('matrix');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=<>?';
+  
+  function randomChar() {
+    return chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  function createSpan() {
+    const span = document.createElement('span');
+    span.textContent = randomChar();
+    span.style.left = Math.random() * 100 + 'vw';
+    span.style.animationDuration = (2 + Math.random() * 3) + 's';
+    span.style.fontSize = (12 + Math.random()*18) + 'px';
+    matrix.appendChild(span);
+
+    setTimeout(() => {
+      span.remove();
+    }, 4000);
+  }
+
+  setInterval(createSpan, 50);
+</script>
+
+  <script src="beta-banner.js"></script>
+</body>
+</html>

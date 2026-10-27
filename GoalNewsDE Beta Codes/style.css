@@ -1,0 +1,395 @@
+/* ===== Root & Variables ===== */
+:root {
+  --bg-main: #0f0f0f;
+  --bg-card: #111;
+  --text-main: #eee;
+
+  --green-main: #1db954;
+  --green-dark: #14a34a;
+  --green-soft: #1db970;
+
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 15px;
+
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+}
+
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* ===== Base ===== */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow-x: hidden;
+  text-align: center;
+  line-height: 1.6;
+  font-family:
+    "Poppins",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+/* ===== Links ===== */
+a {
+  color: var(--green-main);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--green-dark);
+  text-decoration: underline;
+}
+
+/* ===== Buttons ===== */
+.gn-button--small {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+}
+
+/* ===== Header ===== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: linear-gradient(90deg, var(--green-main), var(--green-dark));
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ===== Burger Menu ===== */
+#burger.menu {
+  --s: 36px;
+
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  width: var(--s);
+  height: var(--s);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 101;
+}
+
+#burger span {
+  height: 4px;
+  width: 100%;
+  background: var(--green-soft);
+  border-radius: 2px;
+  transition:
+    transform var(--transition-base),
+    opacity var(--transition-base);
+}
+
+#burger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+#burger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+#burger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+#burger:focus-visible {
+  outline: 2px solid var(--green-main);
+  outline-offset: 4px;
+}
+
+/* ===== Side Menu ===== */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 280px;
+  height: 100%;
+  background: var(--bg-card);
+  padding-top: 80px;
+  transition: right var(--transition-base);
+  z-index: 100;
+}
+
+.side-menu.active {
+  right: 0;
+}
+
+.side-menu ul {
+  list-style: none;
+}
+
+.side-menu li {
+  margin: 10px 0;
+}
+
+.side-menu a {
+  display: block;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  border-radius: var(--radius-sm);
+}
+
+/* ===== Breaking News ===== */
+#breakingNews {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: var(--bg-card);
+  border-left: 4px solid var(--green-main);
+}
+
+.news-wrapper {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: scrollNews 25s linear infinite;
+}
+
+.news-item {
+  padding: 0 50px;
+  font-weight: 600;
+  color: var(--green-main);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+#breakingNews:hover .news-wrapper {
+  animation-play-state: paused;
+}
+
+#breakingNews.locked::before {
+  content: "🔒 Breaking News gesperrt! Kaufe sie mit COINS";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-main);
+  font-weight: 700;
+  font-size: 1.1rem;
+  animation: lockSlide 2s infinite alternate;
+}
+
+#breakingNews.locked .news-wrapper {
+  display: none;
+}
+
+/* ===== Countdown ===== */
+.countdown-section,
+#countdown {
+  margin: 50px 0;
+  color: var(--green-main);
+}
+
+#countdown {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  font-family: "Courier New", monospace;
+}
+
+/* ===== Matches ===== */
+.matches {
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 30px 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.matches h2 {
+  color: var(--green-main);
+  margin-bottom: 15px;
+}
+
+.topspiel {
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.matches-table {
+  width: 95%;
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+.matches-table th,
+.matches-table td {
+  border: 1px solid #444;
+  padding: 15px 20px;
+}
+
+.matches-table th {
+  background: var(--green-main);
+  color: #000;
+}
+
+.goal-animation {
+  background: #66ff66;
+  color: #000;
+  font-weight: 700;
+  animation: pop 0.35s ease forwards;
+}
+
+.over-game {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ===== Footer ===== */
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 10px;
+  font-size: 14px;
+}
+
+/* ===== Cookie Banner ===== */
+.cookie-banner {
+  position: fixed;
+  inset: auto 20px 20px 20px;
+  background: #141414;
+  border: 2px solid var(--green-main);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: none;
+}
+
+/* ===== Animations ===== */
+@keyframes scrollNews {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes lockSlide {
+  from {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 480px) {
+  .news-wrapper {
+    animation-duration: 40s;
+  }
+
+  .cookie-banner {
+    inset: auto 10px 10px 10px;
+    padding: 14px;
+  }
+}
+
+/* ===== Super Bowl Countdown ===== */
+.sb-countdown {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 30px 20px;
+  background: linear-gradient(145deg, var(--bg-card), #0b0b0b);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.sb-label {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--green-main);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sb-timer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.sb-box {
+  background: #0f0f0f;
+  border-radius: var(--radius-md);
+  padding: 18px 10px;
+  box-shadow: inset 0 0 0 1px #1c1c1c;
+}
+
+.sb-box span {
+  display: block;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.sb-box small {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--green-soft);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .sb-timer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

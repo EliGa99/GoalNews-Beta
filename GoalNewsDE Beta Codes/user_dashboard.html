@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>GoalNews – Benutzer Dashboard</title>
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      background: white;
+      margin: 40px auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #1db954;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 6px;
+      background: #1db954;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #169b48;
+    }
+
+    .adminBox {
+      margin-top: 35px;
+      padding: 20px;
+      background: #eefbea;
+      border-left: 5px solid #1db954;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .successMsg {
+      margin-top: 15px;
+      color: #1db954;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Willkommen im Dashboard</h2>
+
+    <p><b id="username">User</b>, schön dass du da bist!</p>
+
+    <!-- Lieblingsverein -->
+    <label>Dein Lieblingsverein:</label>
+    <input id="favTeamInput" placeholder="z. B. Bayern München">
+    <button id="saveTeamBtn">Verein speichern</button>
+
+    <div class="successMsg" id="saveTeamMsg" style="display:none;">
+      ✔ Lieblingsverein gespeichert!
+    </div>
+
+    <!-- Persönliche Nachricht -->
+    <label>Deine Nachricht:</label>
+    <div id="personalMsg" style="
+      padding: 12px; 
+      background:#f0f0f0; 
+      border-radius:6px; 
+      margin-top:5px;">
+      Noch keine Nachricht erhalten.
+    </div>
+
+    <!-- ADMIN BEREICH -->
+    <div class="adminBox" id="adminBox">
+      <h3>🔒 Admin – Nachricht an Benutzer senden</h3>
+
+      <label>User UID:</label>
+      <input id="targetUID" placeholder="UID eingeben">
+
+      <label>Nachricht:</label>
+      <input id="adminMsgInput" placeholder="Nachricht schreiben">
+
+      <button id="sendMsgBtn">Nachricht senden</button>
+
+      <div class="successMsg" id="msgSent" style="display:none;">
+        ✔ Nachricht verschickt!
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+      authDomain: "goalnewsde-community.firebaseapp.com",
+      projectId: "goalnewsde-community",
+      storageBucket: "goalnewsde-community.firebasestorage.app",
+      messagingSenderId: "134523022055",
+      appId: "1:134523022055:web:4f35ed7812d06e4fb55042"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ADMIN_UIDS = ["gaPuzG1ULdUSskKUsciL1g79nh72", "5Oe5YOBOtfOGQsRJ3XUjr3kemnX2"];
+
+    const favTeamInput = document.getElementById("favTeamInput");
+    const saveTeamBtn = document.getElementById("saveTeamBtn");
+    const saveTeamMsg = document.getElementById("saveTeamMsg");
+    const personalMsg = document.getElementById("personalMsg");
+
+    const adminBox = document.getElementById("adminBox");
+    const targetUID = document.getElementById("targetUID");
+    const adminMsgInput = document.getElementById("adminMsgInput");
+    const sendMsgBtn = document.getElementById("sendMsgBtn");
+    const msgSent = document.getElementById("msgSent");
+
+    const usernameField = document.getElementById("username");
+
+    // Hauptfunktion
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+
+      // User anzeigen
+      if (userDoc.exists()) {
+        usernameField.textContent = userDoc.data().username || "User";
+
+        if (userDoc.data().favTeam) {
+          favTeamInput.value = userDoc.data().favTeam;
+        }
+
+        if (userDoc.data().message) {
+          personalMsg.textContent = userDoc.data().message;
+        }
+      }
+
+      // Wenn Admin → Admin-Box anzeigen
+      if (ADMIN_UIDS.includes(user.uid)) {
+        adminBox.style.display = "block";
+      }
+    });
+
+    // Lieblingsverein speichern
+    saveTeamBtn.onclick = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await updateDoc(doc(db, "users", user.uid), {
+        favTeam: favTeamInput.value
+      });
+
+      saveTeamMsg.style.display = "block";
+      setTimeout(() => saveTeamMsg.style.display = "none", 2000);
+    };
+
+    // Admin Nachricht senden
+    sendMsgBtn.onclick = async () => {
+      if (!adminMsgInput.value || !targetUID.value) return;
+
+      await updateDoc(doc(db, "users", targetUID.value), {
+        message: adminMsgInput.value
+      });
+
+      msgSent.style.display = "block";
+      setTimeout(() => msgSent.style.display = "none", 2000);
+    };
+  </script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08111f">
+<title>Daily Spin – GoalNews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{font-family:Inter,system-ui,sans-serif;color:#f8fafc;background:#08111f;color-scheme:dark;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#153052 0,transparent 55%),linear-gradient(145deg,#08111f,#101b2d 65%,#08111f)}
+.panel{width:min(100%,560px);padding:clamp(24px,6vw,44px);text-align:center;border:1px solid #26364b;border-radius:24px;background:rgba(13,24,41,.94);box-shadow:0 28px 90px #0008}
+.brand{margin:0;color:#cbd5e1;font-size:.8rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.brand span{color:#f4c542}
+h1{margin:13px 0 8px;font-size:clamp(2rem,8vw,2.7rem);letter-spacing:-.05em}.lead{margin:0;color:#aebcd0;line-height:1.65}
+.wheel-wrap{position:relative;width:min(72vw,280px);aspect-ratio:1;margin:30px auto 20px;padding:9px;border-radius:50%;background:linear-gradient(145deg,#ffe890,#c68e13);box-shadow:0 0 0 8px #f4c5421c,0 15px 40px #0008}
+.pointer{position:absolute;z-index:2;top:-7px;left:50%;width:0;height:0;transform:translateX(-50%);border-left:15px solid transparent;border-right:15px solid transparent;border-top:27px solid #fff2ae;filter:drop-shadow(0 3px 4px #0008)}
+.wheel{width:100%;height:100%;display:grid;place-items:center;border:4px solid #fff5c2;border-radius:50%;background:conic-gradient(#f4c542 0deg 45deg,#192d47 45deg 90deg,#20b967 90deg 135deg,#192d47 135deg 180deg,#f4c542 180deg 225deg,#192d47 225deg 270deg,#20b967 270deg 315deg,#192d47 315deg 360deg);transition:transform 4.2s cubic-bezier(.12,.72,.12,1);}
+.wheel-labels{position:absolute;inset:9px;border-radius:50%;pointer-events:none}.wheel-labels span{position:absolute;left:50%;top:50%;font-size:.78rem;font-weight:800;color:#0b1523;text-shadow:0 1px #fff6;transform-origin:0 0}.wheel-labels span:nth-child(1){transform:rotate(22.5deg) translateY(-105px)}.wheel-labels span:nth-child(2){transform:rotate(67.5deg) translateY(-105px);color:#fff}.wheel-labels span:nth-child(3){transform:rotate(112.5deg) translateY(-105px)}.wheel-labels span:nth-child(4){transform:rotate(157.5deg) translateY(-105px);color:#fff}.wheel-labels span:nth-child(5){transform:rotate(202.5deg) translateY(-105px)}.wheel-labels span:nth-child(6){transform:rotate(247.5deg) translateY(-105px);color:#fff}.wheel-labels span:nth-child(7){transform:rotate(292.5deg) translateY(-105px)}.wheel-labels span:nth-child(8){transform:rotate(337.5deg) translateY(-105px);color:#fff}
+.hub{position:absolute;z-index:1;left:50%;top:50%;width:70px;height:70px;transform:translate(-50%,-50%);display:grid;place-items:center;border:4px solid #fff6;border-radius:50%;background:#0d1a2b;font-size:1.55rem;box-shadow:0 3px 12px #0007}
+.spin-btn{width:100%;min-height:52px;margin-top:10px;border:0;border-radius:12px;background:linear-gradient(100deg,#f4c542,#ffdf76);color:#17202b;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 24px #f4c54230;transition:transform .18s,filter .18s}.spin-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.05)}.spin-btn:disabled{opacity:.55;cursor:wait}
+.result{min-height:30px;margin:17px 0 4px;font-weight:700;color:#f8d978}.meta{color:#9aabc0;font-size:.88rem;line-height:1.6}.back{display:inline-block;margin-top:20px;color:#cad5e3;text-decoration:none;font-size:.9rem}.back:hover{color:#f4c542}
+@media(max-width:390px){.wheel-labels span:nth-child(n){font-size:.67rem}.wheel-labels span:nth-child(1){transform:rotate(22.5deg) translateY(-84px)}.wheel-labels span:nth-child(2){transform:rotate(67.5deg) translateY(-84px)}.wheel-labels span:nth-child(3){transform:rotate(112.5deg) translateY(-84px)}.wheel-labels span:nth-child(4){transform:rotate(157.5deg) translateY(-84px)}.wheel-labels span:nth-child(5){transform:rotate(202.5deg) translateY(-84px)}.wheel-labels span:nth-child(6){transform:rotate(247.5deg) translateY(-84px)}.wheel-labels span:nth-child(7){transform:rotate(292.5deg) translateY(-84px)}.wheel-labels span:nth-child(8){transform:rotate(337.5deg) translateY(-84px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main class="panel">
+  <p class="brand">Goal<span>News</span> · Daily Bonus</p>
+  <h1>Dein täglicher Spin</h1>
+  <p class="lead">Der Daily Spin ist aus Sicherheitsgründen vorübergehend pausiert. Ohne serverseitige Prüfung könnte die Coin-Belohnung manipuliert werden.</p>
+  <div class="wheel-wrap" aria-label="Glücksrad mit Coin-Belohnungen">
+    <div class="pointer" aria-hidden="true"></div>
+    <div class="wheel" id="wheel" aria-hidden="true"></div>
+    <div class="wheel-labels" aria-hidden="true"><span>10</span><span>25</span><span>50</span><span>15</span><span>150</span><span>20</span><span>75</span><span>30</span></div>
+    <div class="hub" aria-hidden="true">⚽</div>
+  </div>
+  <button class="spin-btn" id="spinBtn" type="button" disabled>Lade dein Konto …</button>
+  <p class="result" id="result" role="status" aria-live="polite"></p>
+  <p class="meta" id="balance">Dein Kontostand wird geladen.</p>
+  <p class="meta" id="lastSpin"></p>
+  <a class="back" href="special.html">← Zurück zum Dashboard</a>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+  authDomain: "goalnewsde-community.firebaseapp.com",
+  projectId: "goalnewsde-community",
+  storageBucket: "goalnewsde-community.firebasestorage.app",
+  messagingSenderId: "134523022055",
+  appId: "1:134523022055:web:4f35ed7812d06e4fb55042",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const spinBtn = document.getElementById("spinBtn");
+const wheel = document.getElementById("wheel");
+const result = document.getElementById("result");
+const balanceEl = document.getElementById("balance");
+const lastSpinEl = document.getElementById("lastSpin");
+const prizes = [10, 25, 50, 15, 150, 20, 75, 30];
+const COINS_PAUSED = true;
+let userRef = null;
+let busy = false;
+
+function localDateKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+}
+function updateDailyState(data) {
+  const coins = Number(data.coins) || 0;
+  balanceEl.textContent = `Dein Kontostand: ${coins.toLocaleString("de-DE")} Coins`;
+  if (COINS_PAUSED) {
+    spinBtn.disabled = true;
+    spinBtn.textContent = "Daily Spin pausiert";
+    result.textContent = "Dein Kontostand bleibt gespeichert. Coin-Verdienen ist derzeit deaktiviert.";
+    document.querySelector(".wheel-wrap").hidden = true;
+    return;
+  }
+  const lastSpin = data.lastSpin || "";
+  lastSpinEl.textContent = lastSpin ? `Letzter Spin: ${lastSpin}` : "Du hast heute noch nicht gedreht.";
+  const alreadySpun = lastSpin === localDateKey();
+  spinBtn.disabled = alreadySpun;
+  spinBtn.textContent = alreadySpun ? "Morgen wartet dein nächster Spin" : "Jetzt drehen";
+  if (alreadySpun) result.textContent = "Dein täglicher Bonus wurde bereits abgeholt. Bis morgen!";
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = "login.html"; return; }
+  userRef = doc(db, "users", user.uid);
+  try {
+    const snapshot = await getDoc(userRef);
+    if (!snapshot.exists()) throw new Error("USER_NOT_FOUND");
+    updateDailyState(snapshot.data());
+  } catch (error) {
+    console.error("Daily-Spin-Konto konnte nicht geladen werden:", error);
+    spinBtn.disabled = true;
+    spinBtn.textContent = "Konto konnte nicht geladen werden";
+    result.textContent = "Bitte lade die Seite neu oder melde dich erneut an.";
+  }
+});
+
+spinBtn.addEventListener("click", async () => {
+  if (COINS_PAUSED) return;
+  if (!userRef || busy) return;
+  busy = true;
+  spinBtn.disabled = true;
+  spinBtn.textContent = "Das Rad dreht sich …";
+  result.textContent = "Viel Glück!";
+  const prizeIndex = Math.floor(Math.random() * prizes.length);
+  const reward = prizes[prizeIndex];
+  const segmentAngle = 360 / prizes.length;
+  const targetAngle = 360 * 6 + (360 - (prizeIndex + 0.5) * segmentAngle);
+  wheel.style.transform = `rotate(${targetAngle}deg)`;
+  try {
+    await new Promise(resolve => window.setTimeout(resolve, 4300));
+    const updated = await runTransaction(db, async transaction => {
+      const snap = await transaction.get(userRef);
+      if (!snap.exists()) throw new Error("USER_NOT_FOUND");
+      const data = snap.data();
+      if (data.lastSpin === localDateKey()) throw new Error("ALREADY_SPUN");
+      const coins = (Number(data.coins) || 0) + reward;
+      transaction.update(userRef, { coins, lastSpin: localDateKey() });
+      return { ...data, coins, lastSpin: localDateKey() };
+    });
+    result.textContent = `🎉 Stark! Du hast ${reward} Coins gewonnen.`;
+    updateDailyState(updated);
+  } catch (error) {
+    console.error("Daily Spin fehlgeschlagen:", error);
+    result.textContent = error.message === "ALREADY_SPUN" ? "Du hast heute bereits gedreht. Dein Bonus wartet morgen wieder auf dich." : "Der Spin konnte nicht gespeichert werden. Bitte prüfe deine Verbindung und versuche es erneut.";
+    spinBtn.disabled = error.message === "ALREADY_SPUN";
+    spinBtn.textContent = error.message === "ALREADY_SPUN" ? "Morgen wartet dein nächster Spin" : "Erneut versuchen";
+    if (error.message === "ALREADY_SPUN") lastSpinEl.textContent = `Letzter Spin: ${localDateKey()}`;
+  } finally {
+    busy = false;
+  }
+});
+</script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function memberAccount() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && request.auth.token.email != null;
+    }
+
+    // Keep this list aligned with the trusted admin accounts in admin.html.
+    function isAdmin() {
+      return signedIn()
+        && request.auth.uid in [
+          'gaPuzG1ULdUSskKUsciL1g79nh72',
+          '5Oe5YOBOtfOGQsRJ3XUjr3kemnX2'
+        ];
+    }
+
+    function changedOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    match /users/{userId} {
+      allow get: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow list: if isAdmin();
+
+      allow create: if memberAccount()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasAll(['username', 'email', 'createdAt', 'emailVerified', 'allowEmails'])
+        && request.resource.data.keys().hasOnly(['username', 'email', 'createdAt', 'emailVerified', 'allowEmails'])
+        && request.resource.data.username is string
+        && request.resource.data.username.size() >= 1
+        && request.resource.data.username.size() <= 40
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt is string
+        && request.resource.data.emailVerified == false
+        && request.resource.data.allowEmails is bool;
+
+      // Coins, ownership flags and reward fields are intentionally immutable
+      // from browser clients. Profile fields remain editable by their owner.
+      allow update: if (signedIn() && request.auth.uid == userId
+          && changedOnly(['username', 'favTeam', 'avatarUrl', 'last_login', 'allowEmails'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['username'])
+              || (request.resource.data.username is string && request.resource.data.username.size() >= 1 && request.resource.data.username.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['favTeam'])
+              || (request.resource.data.favTeam is string && request.resource.data.favTeam.size() <= 80))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['avatarUrl'])
+              || (request.resource.data.avatarUrl is string && request.resource.data.avatarUrl.size() <= 1000))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['last_login'])
+              || request.resource.data.last_login == request.time)
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['allowEmails'])
+              || request.resource.data.allowEmails is bool))
+        || (isAdmin()
+          && changedOnly(['messages', 'message', 'username', 'email'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['messages'])
+              || (request.resource.data.messages is list && request.resource.data.messages.size() <= 100))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['message'])
+              || (request.resource.data.message is string && request.resource.data.message.size() <= 1000))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['username'])
+              || (request.resource.data.username is string && request.resource.data.username.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['email'])
+              || (request.resource.data.email is string && request.resource.data.email.size() <= 254)));
+
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow get: if settingId == 'main';
+      allow list: if false;
+      allow create, update: if isAdmin()
+        && settingId == 'main'
+        && request.resource.data.keys().hasOnly(['maintenance'])
+        && request.resource.data.maintenance is bool;
+      allow delete: if false;
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if memberAccount()
+        && request.resource.data.keys().hasAll(['userId', 'username', 'text', 'created', 'reactions'])
+        && request.resource.data.keys().hasOnly(['userId', 'username', 'text', 'created', 'reactions'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.username is string
+        && request.resource.data.username.size() <= 40
+        && request.resource.data.text is string
+        && request.resource.data.text.size() >= 1
+        && request.resource.data.text.size() <= 1500
+        && request.resource.data.created == request.time
+        && request.resource.data.reactions is map
+        && request.resource.data.reactions.keys().size() == 0;
+      // Reactions are paused because clients currently submit arbitrary totals.
+      allow update: if false;
+      allow delete: if isAdmin()
+        || (memberAccount() && resource.data.userId == request.auth.uid);
+    }
+
+    match /siteRatings/{userId} {
+      allow read: if true;
+      allow create, update: if memberAccount()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasAll(['userId', 'authorName', 'rating', 'text', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['userId', 'authorName', 'rating', 'text', 'updatedAt'])
+        && request.resource.data.userId == userId
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() <= 50
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 600
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /matchPolls/{matchId}/votes/{voterId} {
+      allow read: if memberAccount();
+      allow create: if memberAccount()
+        && request.auth.uid == voterId
+        && request.resource.data.keys().hasAll(['choice', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['choice', 'createdAt'])
+        && request.resource.data.choice in ['home', 'draw', 'away']
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // Public submissions are size/type limited; only admins can inspect them.
+    match /reports/{entryId} {
+      allow create: if memberAccount()
+        && request.resource.data.keys().hasAll(['type', 'description', 'created'])
+        && request.resource.data.keys().hasOnly(['type', 'description', 'created'])
+        && request.resource.data.type is string && request.resource.data.type.size() <= 80
+        && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 3000
+        && request.resource.data.created == request.time;
+      allow read: if isAdmin();
+    }
+    match /ideas/{entryId} {
+      allow create: if memberAccount()
+        && request.resource.data.keys().hasAll(['title', 'description', 'created'])
+        && request.resource.data.keys().hasOnly(['title', 'description', 'created'])
+        && request.resource.data.title is string && request.resource.data.title.size() >= 1 && request.resource.data.title.size() <= 120
+        && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 3000
+        && request.resource.data.created == request.time;
+      allow read: if isAdmin();
+    }
+    match /feedback/{entryId} {
+      allow create: if memberAccount()
+        && request.resource.data.keys().hasAll(['feedback', 'created'])
+        && request.resource.data.keys().hasOnly(['feedback', 'created'])
+        && request.resource.data.feedback is string && request.resource.data.feedback.size() >= 1 && request.resource.data.feedback.size() <= 3000
+        && request.resource.data.created == request.time;
+      allow read: if isAdmin();
+    }
+    match /features/{entryId} {
+      allow create: if memberAccount()
+        && request.resource.data.keys().hasAll(['title', 'description', 'created'])
+        && request.resource.data.keys().hasOnly(['title', 'description', 'created'])
+        && request.resource.data.title is string && request.resource.data.title.size() >= 1 && request.resource.data.title.size() <= 120
+        && request.resource.data.description is string && request.resource.data.description.size() >= 1 && request.resource.data.description.size() <= 3000
+        && request.resource.data.created == request.time;
+      allow read: if isAdmin();
+    }
+
+    match /logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll(['action', 'time', 'admin'])
+        && request.resource.data.keys().hasOnly(['action', 'time', 'admin'])
+        && request.resource.data.action is string && request.resource.data.action.size() <= 500
+        && request.resource.data.time is timestamp
+        && request.resource.data.admin == request.auth.uid;
+    }
+
+    match /visits/{entryId} { allow read: if isAdmin(); }
+    match /tipps/{entryId} { allow read: if isAdmin(); }
+
+    // Read-only public data. Client-side poll totals and votes are not trusted.
+    match /liveGames/{entryId} { allow read: if true; }
+    match /FootballGames/{entryId} { allow read: if true; }
+    match /pollOptions/{optionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /polls/{pollId} {
+      allow get: if isAdmin() || pollId == 'player_of_the_week';
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+  }
+}

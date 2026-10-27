@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoalNews - Foot- & Fußballnews</title>
+
+<!-- Favicon -->
+<link rel="icon" href="https://i.ibb.co/21R6p75W/Logo-1.jpg" type="image/jpeg">
+
+<style>
+body { font-family: 'Poppins', sans-serif; background:#0f0f0f; color:#eee; text-align:center; margin:0; }
+h2 { margin:20px 0; color:#1db954; }
+
+/* Tabelle Live Spiele */
+.matches-table { 
+    width:95%; max-width:1200px; margin:20px auto; border-collapse: collapse; 
+    border: 2px solid #1db954;
+    box-shadow: 0 0 25px rgba(29,185,84,0.2);
+    animation: liveGlow 3s ease-in-out infinite alternate;
+}
+.matches-table th, .matches-table td { 
+    border:1px solid #444; padding:15px 20px; text-align:center; transition: all 0.5s ease; position: relative; font-size:1rem; 
+}
+.matches-table th { background:#1db954; color:#000; }
+
+.over-game { text-decoration:line-through; opacity:0.6; transition:all 0.5s ease; }
+
+/* Tor Animation */
+.goal-animation { background:#00ff00; color:#000; font-weight:bold; transform:scale(1.2); animation:pop 0.5s forwards; }
+.goal-flash { animation: flashGoal 0.6s ease-in-out; }
+@keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.5);} 100%{transform:scale(1.2);} }
+@keyframes flashGoal {
+  0% { background:#00ff00; box-shadow:0 0 20px #00ff00; transform:scale(1.1);}
+  50% { background:#1db954; transform:scale(0.95);}
+  100% { background:transparent; transform:scale(1);}
+}
+
+/* Karten Animation */
+.card-anim { animation: cardPop 1s ease forwards; }
+@keyframes cardPop {
+  0% { transform:scale(0.5) rotate(-20deg); opacity:0; }
+  60% { transform:scale(1.2) rotate(10deg); opacity:1; }
+  100% { transform:scale(1) rotate(0); }
+}
+
+/* Glühende Tabelle */
+@keyframes liveGlow {
+  from { box-shadow: 0 0 10px rgba(29,185,84,0.2); }
+  to   { box-shadow: 0 0 25px rgba(29,185,84,0.7); }
+}
+
+/* Halbzeit Label */
+.half-time-animation {
+  position:absolute; top:5px; right:5px;
+  background:rgba(29,185,84,0.9); color:#000;
+  font-weight:bold; padding:2px 8px; border-radius:6px;
+  font-size:0.8rem; pointer-events:none;
+  animation:halftimeSlide 2s ease forwards, halftimePulse 1.5s infinite alternate;
+}
+@keyframes halftimePulse {
+  0%{transform:scale(1);opacity:0.8;}
+  50%{transform:scale(1.2);opacity:1;}
+  100%{transform:scale(1);opacity:0.9;}
+}
+@keyframes halftimeSlide {
+  0% { transform:translateY(-30px); opacity:0; }
+  100% { transform:translateY(0); opacity:1; }
+}
+
+/* Uhr */
+.match-timer { display:block; margin-top:8px; font-size:0.9rem; color:#1db954; }
+
+/* VAR Kommentar */
+.var-comment {
+  display:block; margin-top:5px;
+  background:linear-gradient(135deg,#FFD700,#FFEA70);
+  color:#000; font-weight:bold; padding:4px 12px;
+  border-radius:8px; font-size:0.9rem;
+  opacity:0; transform:translateY(20px) scale(0.8);
+  animation:varCool 1.5s ease forwards, varGlow 0.8s ease-in-out infinite alternate;
+  text-align:center;
+  border:2px solid #ff0000;
+}
+@keyframes varCool {
+  0%{opacity:0;transform:translateY(20px)scale(0.8);}
+  50%{opacity:1;transform:translateY(-5px)scale(1.1);}
+  70%{transform:translateY(0)scale(1);}
+  100%{opacity:1;transform:translateY(0)scale(1);}
+}
+@keyframes varGlow {
+  0%{box-shadow:0 0 10px #ff0000;}
+  100%{box-shadow:0 0 25px #ff0000;}
+}
+
+/* Tor Partikel */
+.goal-particle {
+  position:absolute; bottom:0; width:6px; height:6px;
+  background:#1db954; border-radius:50%;
+  animation: flyUp 1s ease-out forwards;
+}
+@keyframes flyUp {
+  0% { transform:translateY(0) scale(1); opacity:1; }
+  100% { transform:translateY(-60px) scale(0); opacity:0; }
+}
+
+</style>
+</head>
+<body>
+
+<h2>Live Spiele</h2>
+<p>Alle Spiele sind live und im Gange</p>
+<p>Durchgestrichene Spiele sind beendet</p>
+
+<table class="matches-table">
+<thead>
+<tr><th>Heimteam</th><th>Gastteam</th><th>Ergebnis / Zeit</th></tr>
+</thead>
+<tbody id="tableBody">
+<tr><td colspan="3">Lade Spiele...</td></tr>
+</tbody>
+</table>
+
+<footer>GoalNews © 2025</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+  authDomain: "goalnewsde-community.firebaseapp.com",
+  projectId: "goalnewsde-community",
+  storageBucket: "goalnewsde-community.firebasestorage.app",
+  messagingSenderId: "134523022055",
+  appId: "1:134523022055:web:4f35ed7812d06e4fb55042"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const tableBody = document.getElementById("tableBody");
+const matchTimers = new Map();
+
+function addHalfTimeAnimation(td) {
+  if (!td.querySelector('.half-time-animation')) {
+    const overlay = document.createElement("div");
+    overlay.className = "half-time-animation";
+    overlay.textContent = "Halbzeit!";
+    td.appendChild(overlay);
+  }
+}
+function removeHalfTimeAnimation(td) {
+  const overlay = td.querySelector('.half-time-animation');
+  if (overlay) overlay.remove();
+}
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms/1000);
+  const minutes = Math.floor(totalSeconds/60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2,"0")}`;
+}
+
+function startMatchTimer(id, td, startTime, halfTime, over=false) {
+  if (matchTimers.has(id)) clearInterval(matchTimers.get(id));
+  const timerEl = document.createElement("span");
+  timerEl.className = "match-timer";
+  td.appendChild(timerEl);
+
+  let paused = halfTime || over;
+
+  const interval = setInterval(() => {
+    if (!paused) {
+      const elapsed = Date.now() - startTime;
+      const minutes = Math.floor(elapsed/60000);
+      const seconds = Math.floor((elapsed/1000)%60);
+      timerEl.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2,"0")}`;
+    } else {
+      timerEl.textContent = over ? "🕛 90:00" : "⏸️ Halbzeit";
+    }
+  }, 1000);
+
+  matchTimers.set(id, interval);
+}
+
+function showVARComment(td, comment) {
+  let varDiv = td.querySelector('.var-comment');
+  if (!varDiv) {
+    varDiv = document.createElement("span");
+    varDiv.className = "var-comment";
+    td.appendChild(varDiv);
+  }
+  varDiv.textContent = comment;
+  varDiv.style.opacity = 1;
+  setTimeout(()=>{ varDiv.style.opacity=0; },5000);
+}
+
+function showGoalFirework(td) {
+  for (let i=0; i<10; i++) {
+    const particle = document.createElement("div");
+    particle.className="goal-particle";
+    td.appendChild(particle);
+    particle.style.left=Math.random()*100+"%";
+    particle.style.animationDelay=Math.random()*0.3+"s";
+    setTimeout(()=>particle.remove(),1000);
+  }
+}
+
+async function initLiveGames() {
+  const colRef = collection(db, "liveGames");
+  onSnapshot(colRef, snapshot => {
+    tableBody.innerHTML = "";
+    if (snapshot.empty) {
+      tableBody.innerHTML = "<tr><td colspan='3'>Keine aktuellen Spiele</td></tr>";
+      return;
+    }
+
+    snapshot.forEach(doc=>{
+      const data = doc.data();
+      if (doc.id === "next_game") return;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="${data.over?'over-game':''}">${data.home || ""}</td>
+        <td class="${data.over?'over-game':''}">${data.away || ""}</td>
+        <td class="${data.goal?'goal-animation':''} ${data.over?'over-game':''}">${data.score || ""}</td>
+      `;
+      tableBody.appendChild(tr);
+
+      const td = tr.querySelector("td:nth-child(3)");
+
+      if (data.halfTime) addHalfTimeAnimation(td); else removeHalfTimeAnimation(td);
+
+      if (data.startTime) startMatchTimer(doc.id, td, data.startTime.toDate().getTime(), data.halfTime, data.over);
+
+      if (data.varComment) showVARComment(td, data.varComment);
+
+      if (data.goal) showGoalFirework(td);
+    });
+  });
+}
+
+initLiveGames();
+</script>
+
+  <script src="beta-banner.js"></script>
+</body>
+</html>
+

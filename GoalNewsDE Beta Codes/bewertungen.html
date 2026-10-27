@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="Bewerte GoalNews mit Sternen und optionalem Kommentar.">
+  <title>Bewertungen – GoalNews</title>
+  <link rel="stylesheet" href="ligatabelle.css">
+  <style>
+    .rating-hero { padding:clamp(24px,5vw,46px); border:1px solid #ffffff18; border-radius:22px; background:radial-gradient(ellipse at 88% 0,#314c2877,transparent 45%),linear-gradient(135deg,#172638,#101a29); }
+    .rating-hero h1 { font-size:clamp(2rem,6vw,3.3rem); }
+    .rating-hero p:last-child { max-width:650px; margin:14px 0 0; color:#aebcd0; line-height:1.65; }
+    .rating-layout { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:18px; align-items:start; margin-top:22px; }
+    .rating-panel { overflow:hidden; border:1px solid #ffffff16; border-radius:17px; background:#111b2a; box-shadow:0 18px 45px #0003; }
+    .panel-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 19px; border-bottom:1px solid #ffffff12; }
+    .panel-heading h2 { margin:0; font-size:1.02rem; }
+    .rating-summary { display:flex; align-items:center; gap:12px; padding:15px 18px; border-bottom:1px solid #ffffff10; }
+    .average { color:#e3ffad; font-size:1.8rem; font-weight:850; font-variant-numeric:tabular-nums; }
+    .average-stars { color:#c8f279; letter-spacing:.08em; }
+    .review-count { color:#91a0b4; font-size:.78rem; }
+    .rating-form { padding:18px; }
+    .rating-form fieldset { min-width:0; margin:0; padding:0; border:0; }
+    .rating-form fieldset:disabled { opacity:.55; }
+    .rating-label { display:block; margin-bottom:7px; color:#dce5ef; font-size:.87rem; font-weight:750; }
+    .star-picker { display:flex; gap:7px; margin:4px 0 16px; }
+    .star-button { padding:2px; border:0; background:transparent; color:#627184; font-size:2rem; line-height:1; cursor:pointer; transition:transform .14s,color .14s; }
+    .star-button:hover { transform:scale(1.14); }
+    .star-button.active { color:#c8f279; }
+    .rating-form textarea { display:block; width:100%; min-height:125px; padding:13px; resize:vertical; border:1px solid #ffffff20; border-radius:11px; outline:none; background:#091321; color:#f5f8fc; font:inherit; line-height:1.5; }
+    .rating-form textarea::placeholder { color:#8391a2; }
+    .rating-form textarea:focus { border-color:#c8f279; box-shadow:0 0 0 4px #c8f2791c; }
+    .form-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; }
+    .auth-note { color:#91a0b4; font-size:.78rem; line-height:1.5; }
+    .auth-note a { color:#c8f279; font-weight:750; text-decoration:none; }
+    .auth-note a:hover { text-decoration:underline; }
+    .submit-rating { min-height:43px; padding:0 15px; border:0; border-radius:9px; background:#c8f279; color:#102013; font:inherit; font-size:.84rem; font-weight:800; cursor:pointer; }
+    .submit-rating:disabled { opacity:.45; cursor:not-allowed; }
+    .review-list { display:grid; gap:10px; padding:14px; }
+    .review-card { padding:14px; border:1px solid #ffffff12; border-radius:12px; background:#ffffff05; }
+    .review-head { display:flex; justify-content:space-between; gap:12px; }
+    .review-author { color:#e6edf6; font-size:.86rem; font-weight:750; }
+    .review-date { margin-top:3px; color:#8595a9; font-size:.72rem; }
+    .review-stars { color:#c8f279; letter-spacing:.06em; white-space:nowrap; }
+    .review-text { margin:12px 0 0; color:#cbd6e2; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .status-message { min-height:1.3em; margin:10px 0 0; color:#aebcd0; font-size:.82rem; }
+    .status-message.error { color:#ffaaa2; }
+    .empty-reviews { padding:22px 14px; color:#91a0b4; text-align:center; }
+    @media(max-width:760px) { .rating-layout { grid-template-columns:1fr; } }
+    @media(max-width:460px) { .form-footer { align-items:stretch; flex-direction:column; } .submit-rating { width:100%; } .review-head { flex-direction:column; gap:5px; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">Goal<span>News</span></a>
+    <nav class="site-nav" aria-label="Hauptnavigation">
+      <a href="index.html">Startseite</a>
+      <a href="komments.html">Kommentarforum</a>
+      <a href="bewertungen.html" aria-current="page">Bewertungen</a>
+    </nav>
+  </header>
+  <main>
+    <section class="rating-hero">
+      <p class="eyebrow">Deine Meinung zählt</p>
+      <h1>GoalNews bewerten</h1>
+      <p>Wie gefällt dir GoalNews? Vergib ein bis fünf Sterne. Einen kurzen Text kannst du freiwillig ergänzen. Bewertungen schreiben können nur angemeldete Mitglieder.</p>
+    </section>
+    <div class="rating-layout">
+      <section class="rating-panel" aria-labelledby="formHeading">
+        <div class="panel-heading"><h2 id="formHeading">Deine Bewertung</h2><span class="updated">Text optional</span></div>
+        <form class="rating-form" id="ratingForm">
+          <fieldset id="ratingFields" disabled>
+            <span class="rating-label" id="starLabel">Sterne auswählen</span>
+            <div class="star-picker" role="group" aria-labelledby="starLabel">
+              <button class="star-button" type="button" data-rating="1" aria-label="1 Stern">★</button>
+              <button class="star-button" type="button" data-rating="2" aria-label="2 Sterne">★</button>
+              <button class="star-button" type="button" data-rating="3" aria-label="3 Sterne">★</button>
+              <button class="star-button" type="button" data-rating="4" aria-label="4 Sterne">★</button>
+              <button class="star-button" type="button" data-rating="5" aria-label="5 Sterne">★</button>
+            </div>
+            <label class="rating-label" for="reviewText">Dein Kommentar <span style="color:#91a0b4;font-weight:400">(optional)</span></label>
+            <textarea id="reviewText" maxlength="600" placeholder="Was gefällt dir oder was können wir verbessern?"></textarea>
+            <div class="form-footer">
+              <span class="auth-note" id="authNote">Bitte anmelden, um eine Bewertung abzugeben.</span>
+              <button class="submit-rating" id="submitRating" type="submit" disabled>Bewertung senden</button>
+            </div>
+          </fieldset>
+          <p class="status-message" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="rating-panel" aria-labelledby="reviewsHeading">
+        <div class="panel-heading"><h2 id="reviewsHeading">Stimmen der Community</h2></div>
+        <div class="rating-summary"><span class="average" id="averageRating">–</span><span><span class="average-stars" id="averageStars">☆☆☆☆☆</span><span class="review-count" id="reviewCount">Noch keine Bewertungen</span></span></div>
+        <div class="review-list" id="reviewList" aria-live="polite"><p class="empty-reviews">Bewertungen werden geladen …</p></div>
+      </section>
+    </div>
+  </main>
+  <footer class="footer"><a href="index.html">Zurück zur Startseite</a></footer>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+      authDomain: "goalnewsde-community.firebaseapp.com",
+      projectId: "goalnewsde-community",
+      storageBucket: "goalnewsde-community.firebasestorage.app",
+      messagingSenderId: "134523022055",
+      appId: "1:134523022055:web:4f35ed7812d06e4fb55042",
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const ratingFields = document.getElementById("ratingFields");
+    const starButtons = [...document.querySelectorAll(".star-button")];
+    const reviewText = document.getElementById("reviewText");
+    const submitButton = document.getElementById("submitRating");
+    const formStatus = document.getElementById("formStatus");
+    const authNote = document.getElementById("authNote");
+    const reviewList = document.getElementById("reviewList");
+    const ratingsQuery = query(collection(db, "siteRatings"), orderBy("updatedAt", "desc"));
+    let selectedRating = 0;
+    let currentUser = null;
+    let ownRating = null;
+
+    function chooseRating(value) {
+      selectedRating = value;
+      starButtons.forEach(button => {
+        const active = Number(button.dataset.rating) <= value;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(Number(button.dataset.rating) === value));
+      });
+      document.getElementById("starLabel").textContent = `${value} von 5 Sternen`;
+    }
+    starButtons.forEach(button => button.addEventListener("click", () => chooseRating(Number(button.dataset.rating))));
+
+    function formatDate(timestamp) {
+      return timestamp?.toDate ? timestamp.toDate().toLocaleDateString("de-DE", { day:"2-digit", month:"long", year:"numeric" }) : "Gerade eben";
+    }
+
+    function renderReviews(snapshot) {
+      const rows = snapshot.docs.map(item => ({ id:item.id, ...item.data() }));
+      const valid = rows.filter(item => Number.isInteger(item.rating) && item.rating >= 1 && item.rating <= 5);
+      const average = valid.length ? valid.reduce((sum, item) => sum + item.rating, 0) / valid.length : 0;
+      document.getElementById("averageRating").textContent = valid.length ? average.toFixed(1) : "–";
+      document.getElementById("averageStars").textContent = valid.length ? `${"★".repeat(Math.round(average))}${"☆".repeat(5 - Math.round(average))}` : "☆☆☆☆☆";
+      document.getElementById("reviewCount").textContent = valid.length === 1 ? "1 Bewertung" : `${valid.length} Bewertungen`;
+      ownRating = currentUser ? valid.find(item => item.id === currentUser.uid) || null : null;
+      if (ownRating) {
+        chooseRating(ownRating.rating);
+        reviewText.value = ownRating.text || "";
+      }
+      if (!valid.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty-reviews";
+        empty.textContent = "Noch keine Bewertungen. Sei die erste Person, die GoalNews bewertet.";
+        reviewList.replaceChildren(empty);
+        return;
+      }
+      reviewList.replaceChildren(...valid.map(item => {
+        const card = document.createElement("article");
+        card.className = "review-card";
+        const head = document.createElement("div");
+        head.className = "review-head";
+        const identity = document.createElement("div");
+        const author = document.createElement("div");
+        author.className = "review-author";
+        author.textContent = item.authorName || "GoalNews-Mitglied";
+        const date = document.createElement("time");
+        date.className = "review-date";
+        date.textContent = formatDate(item.updatedAt);
+        identity.append(author, date);
+        const stars = document.createElement("span");
+        stars.className = "review-stars";
+        stars.textContent = `${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}`;
+        stars.setAttribute("aria-label", `${item.rating} von 5 Sternen`);
+        head.append(identity, stars);
+        card.appendChild(head);
+        if (item.text) {
+          const text = document.createElement("p");
+          text.className = "review-text";
+          text.textContent = item.text;
+          card.appendChild(text);
+        }
+        return card;
+      }));
+    }
+
+    onSnapshot(ratingsQuery, renderReviews, error => {
+      console.error("Bewertungen konnten nicht geladen werden:", error);
+      reviewList.textContent = "Bewertungen sind gerade nicht erreichbar.";
+    });
+
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      ratingFields.disabled = !user;
+      submitButton.disabled = !user;
+      authNote.replaceChildren();
+      if (!user) {
+        authNote.append(document.createTextNode("Zum Bewerten bitte "));
+        const login = document.createElement("a");
+        login.href = "login.html";
+        login.textContent = "anmelden";
+        authNote.append(login, document.createTextNode("."));
+      } else {
+        authNote.textContent = "Du kannst deine Bewertung jederzeit aktualisieren.";
+      }
+      if (user) getDoc(doc(db, "siteRatings", user.uid)).then(snapshot => {
+        if (snapshot.exists()) {
+          const existing = snapshot.data();
+          chooseRating(existing.rating);
+          reviewText.value = existing.text || "";
+          submitButton.textContent = "Bewertung aktualisieren";
+        }
+      }).catch(error => console.debug("Vorhandene Bewertung konnte nicht geladen werden:", error));
+    });
+
+    document.getElementById("ratingForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!currentUser) {
+        formStatus.textContent = "Bitte zuerst anmelden.";
+        return;
+      }
+      if (selectedRating < 1 || selectedRating > 5) {
+        formStatus.textContent = "Bitte zuerst die Sterne auswählen.";
+        formStatus.classList.add("error");
+        return;
+      }
+      submitButton.disabled = true;
+      formStatus.classList.remove("error");
+      formStatus.textContent = "Bewertung wird gespeichert …";
+      try {
+        let authorName = currentUser.displayName || "GoalNews-Mitglied";
+        try {
+          const profile = await getDoc(doc(db, "users", currentUser.uid));
+          if (profile.exists() && profile.data().username) authorName = String(profile.data().username).slice(0, 50);
+        } catch { /* The rating remains available with a generic member name. */ }
+        await setDoc(doc(db, "siteRatings", currentUser.uid), {
+          userId: currentUser.uid,
+          authorName,
+          rating: selectedRating,
+          text: reviewText.value.trim().slice(0, 600),
+          updatedAt: serverTimestamp(),
+        });
+        formStatus.textContent = "Danke! Deine Bewertung wurde gespeichert.";
+        submitButton.textContent = "Bewertung aktualisieren";
+      } catch (error) {
+        console.error("Bewertung konnte nicht gespeichert werden:", error);
+        formStatus.textContent = error.code === "permission-denied"
+          ? "Firebase hat das Speichern abgelehnt. Für siteRatings müssen Firestore-Regeln ergänzt werden."
+          : `Bewertung konnte nicht gespeichert werden (${error.code || "Fehler"}). Bitte erneut versuchen.`;
+        formStatus.classList.add("error");
+      } finally {
+        submitButton.disabled = !currentUser;
+      }
+    });
+  </script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>
