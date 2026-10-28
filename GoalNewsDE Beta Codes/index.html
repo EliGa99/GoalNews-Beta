@@ -41,6 +41,8 @@
       body { min-height: 100%; background: radial-gradient(ellipse at 50% -15%, #17365a 0, transparent 48%), #080f1b; color: #f4f7fb; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-align: left; }
       body > header { position: sticky; top: 0; z-index: 100; min-height: 72px; padding: 14px clamp(18px, 5vw, 64px); border-bottom: 1px solid #ffffff12; background: #08111fee; box-shadow: 0 8px 28px #0003; }
       .logo { color: #f8fafc; font-size: 1.4rem; font-weight: 800; letter-spacing: -.04em; }
+      .brand-greeting { display:flex; align-items:baseline; gap:14px; min-width:0; padding-right:54px; }
+      .user-greeting:not([hidden]) { display:inline-flex; max-width:min(38vw,340px); overflow:hidden; color:#c8f279; font-size:.95rem; font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
       #burger.menu { top: 18px; right: clamp(18px, 5vw, 64px); width: 36px; height: 36px; }
       #burger span { background: #c8f279; }
       #burger:focus-visible { outline-color: #c8f279; }
@@ -116,7 +118,7 @@
         .algorithm-tip { margin: 8px auto 0; max-width: 100%; font-size: .72rem; }
         .match-event { margin-top: 4px; font-size: .72rem; }
       }
-      @media (max-width: 540px) { body > header { min-height: 64px; } #burger.menu { top: 14px; right: 16px; } #breakingNews { width: calc(100% - 24px); } .upcoming-match { grid-template-columns: 82px minmax(0,1fr); gap: 9px; padding: 10px; } }
+      @media (max-width: 540px) { body > header { min-height: 64px; } .brand-greeting { gap:8px; padding-right:48px; } .logo { font-size:1.2rem; } .user-greeting:not([hidden]) { max-width:calc(100vw - 170px); font-size:.78rem; } #burger.menu { top: 14px; right: 16px; } #breakingNews { width: calc(100% - 24px); } .upcoming-match { grid-template-columns: 82px minmax(0,1fr); gap: 9px; padding: 10px; } }
     </style>
 
     <!-- PWA -->
@@ -146,12 +148,87 @@
       gtag("js", new Date());
       gtag("config", "G-C1HQFFK8NB", { anonymize_ip: true });
     </script>
-  </head>
+    <style>
+    .beta-feedback-quick{width:min(1180px,calc(100% - 32px));margin:16px auto 8px;padding:15px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border:1px solid #c8f27955;border-left:4px solid #c8f279;border-radius:13px;background:linear-gradient(105deg,#c8f27912,#111b2a 58%);color:#f4f7fb}
+    .beta-feedback-quick strong{display:block;color:#d8ff91;font-size:.95rem}
+    .beta-feedback-quick span{display:block;margin-top:3px;color:#aab7c8;font-size:.84rem}
+    .beta-feedback-quick a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border:1px solid #c8f27966;border-radius:9px;background:#c8f27912;color:#d8ff91;font-size:.86rem;font-weight:800;text-decoration:none}
+    .beta-feedback-quick a:hover{background:#c8f27924}
+    @media(max-width:540px){.beta-feedback-quick{align-items:flex-start}.beta-feedback-quick a{width:100%}}
+  </style>
+  
+<style>
+  .bewertung-quick {
+    width: min(1180px, calc(100% - 32px));
+    margin: 16px auto 8px;
+    padding: 15px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #c8f27955;
+    border-left: 4px solid #c8f279;
+    border-radius: 13px;
+
+    /* Der Karten-Hintergrund */
+    background: linear-gradient(
+      105deg,
+      #c8f27930 0%,
+      #182638 58%,
+      #111b2a 100%
+    );
+
+    color: #f4f7fb;
+  }
+  .bewertung-quick strong {
+    display: block;
+    color: #d8ff91;
+    font-size: .95rem;
+  }
+  .bewertung-quick span {
+    display: block;
+    margin-top: 3px;
+    color: #aab7c8;
+    font-size: .84rem;
+  }
+  .bewertung-quick a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid #c8f27966;
+    border-radius: 9px;
+    background: #c8f27912;
+    color: #d8ff91;
+    font-size: .86rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .bewertung-quick a:hover {
+    background: linear-gradient(105deg, #c8f27940, #d8ff91);
+  }
+  @media (max-width: 540px) {
+    .bewertung-quick {
+      align-items: flex-start;
+    }
+
+    .bewertung-quick a {
+      width: 100%;
+    }
+  }
+</style>
+
+</head>
 
   <body>
     <!-- Header -->
     <header>
-      <div class="logo">GoalNews</div>
+      <div class="brand-greeting">
+        <div class="logo">GoalNews</div>
+        <span id="userGreeting" class="user-greeting" hidden aria-live="polite"></span>
+      </div>
 
       <!-- Hamburger -->
       <button id="burger" class="menu" aria-label="Menü anzeigen">
@@ -164,6 +241,7 @@
       <nav id="sideMenu" class="side-menu">
         <ul>
           <li><a href="highlights.html">Bundesliga Highlights</a></li>
+          <li><a href="entwicklungs-infos.html">🛠️ Entwicklungsinfos</a></li>
           <li><a href="ueber_uns.html">About Us</a></li>
           <li><a href="experten-tipp.html">Experten-Tipp</a></li>
           <li><a href="login.html">Login/Registrieren</a></li>
@@ -174,15 +252,14 @@
           <li><a href="bewertungen.html">Bewertungen</a></li>
           <li><a href="feedback.html">Helfen Sie uns!</a></li>
           <li><a href="coins.html">Was sind COINS</a></li>
-          <li><a href="download.html">Downloads/PDFs</a></li>
-          <li>
-            <a href="https://whatsapp.com/channel/0029Vb7PDwN8V0toB3ATWZ1Y"
-              >WhatsApp</a
-            >
-          </li>
         </ul>
       </nav>
     </header>
+
+    <aside class="beta-feedback-quick" aria-label="Beta-Feedback">
+      <div><strong>🧪 GoalNews Beta: Fehler oder Idee?</strong><span>Hilf uns, Probleme zu finden und die Seite zu verbessern.</span></div>
+      <a href="beta-bugs.html">Beta-Feedback senden&nbsp; ↗</a>
+    </aside>
 
     <!-- Breaking News -->
     <div id="breakingNews" class="locked">
@@ -195,6 +272,11 @@
       <strong id="favoriteGameTitle">⚽ Spielhinweis</strong>
       <p id="favoriteGameText">Der Spielplan wird geladen …</p>
       <a href="special.html">Lieblingsverein im Dashboard ändern</a>
+    </aside>
+
+    <aside class="bewertung-quick" aria-label="Beta-Feedback">
+      <div><strong>Dir Gefällt GoalNews?</strong><span>Lass es uns wissen!</span></div>
+      <a href="bewertungen.html">Bewertung hinterlassen&nbsp; ↗</a>
     </aside>
 
     <section class="football-overview" aria-label="Aktuelle Tabellen und Spiele">
@@ -343,8 +425,11 @@
 
       // ===== Breaking News Toggle =====
       const breakingEl = document.getElementById("breakingNews");
+      const userGreeting = document.getElementById("userGreeting");
       onAuthStateChanged(auth, (user) => {
-        if (!user) {
+        if (!user || user.isAnonymous) {
+          userGreeting.hidden = true;
+          userGreeting.textContent = "";
           breakingEl.classList.add("locked");
           favoriteGameNotice.hidden = true;
           observedFavoriteTeam = null;
@@ -352,9 +437,13 @@
           favoriteGameTimer = null;
           return;
         }
+        userGreeting.hidden = false;
+        userGreeting.textContent = `Hallo, ${user.displayName || user.email?.split("@")[0] || "Fußballfan"}`;
         const userRef = doc(db, "users", user.uid);
         onSnapshot(userRef, (snap) => {
           const data = snap.data() || {};
+          const username = String(data.username || user.displayName || user.email?.split("@")[0] || "Fußballfan").slice(0, 40);
+          userGreeting.textContent = `Hallo, ${username}`;
           breakingEl.classList.toggle("locked", !data.breakingNews);
           const team = String(data.favTeam || "").trim();
           if (team !== observedFavoriteTeam) {
