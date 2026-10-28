@@ -11,6 +11,10 @@
     .hero{padding:clamp(25px,5vw,46px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,#14253a,#101a29 65%);box-shadow:0 22px 60px #0005}.eyebrow{margin:0 0 12px;color:var(--lime);font-size:.76rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}h1{margin:0;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.05em;line-height:1.05}.intro{max-width:710px;margin:15px 0 0;color:#c4d0dd;line-height:1.7}
     .section-title{margin:28px 2px 13px;font-size:1.1rem}.project{position:relative;overflow:hidden;padding:clamp(20px,4vw,30px);border:1px solid #c8f27945;border-radius:18px;background:linear-gradient(120deg,#c8f27910,#111b2a 55%,#101a29);box-shadow:0 16px 42px #0003}.project-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}.project h2{margin:0;font-size:clamp(1.2rem,3vw,1.55rem)}.status{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #c8f27955;border-radius:999px;background:#c8f27912;color:var(--lime2);font-size:.73rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px #c8f27999}.project p{max-width:760px;margin:13px 0 0;color:#c4d0dd;line-height:1.7}.project-note{margin-top:18px;padding-top:14px;border-top:1px solid #ffffff14;color:var(--muted);font-size:.86rem;line-height:1.6}
     .feedback{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;padding:18px 20px;border:1px solid var(--line);border-radius:15px;background:#101a29}.feedback p{margin:0;color:#c4d0dd;line-height:1.55}.button{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:0 15px;border:1px solid #c8f27966;border-radius:10px;background:#c8f27912;color:var(--lime2);font-size:.87rem;font-weight:800;text-decoration:none}.button:hover{background:#c8f27922}
+    .project-list{display:grid;gap:13px}.project[data-status="done"]{border-color:#ffffff22;background:linear-gradient(120deg,#ffffff07,#101a29 58%)}
+    .project[data-status="planned"] .dot{background:#9eb2ca;box-shadow:none}.project[data-status="in-progress"] .dot{background:#ffd166;box-shadow:0 0 10px #ffd16699}
+    .project[data-status="done"] .dot{background:#8b98a9;box-shadow:none}.project .status{white-space:nowrap}.project-note a{color:var(--lime2);font-weight:750;text-decoration:none}.project-note a:hover{text-decoration:underline}
+    .loading{padding:20px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
     footer{padding:24px 0 8px;color:#8290a3;text-align:center;font-size:.82rem}
     @media(max-width:500px){.wrap{padding-top:17px}.top{align-items:flex-start;flex-direction:column}.project-top{align-items:flex-start}.feedback .button{width:100%}}
   </style>
@@ -19,15 +23,72 @@
   <main class="wrap">
     <div class="top"><div class="brand">Goal<span>News</span> · Beta</div><a class="back" href="index.html">← Zur Startseite</a></div>
     <section class="hero"><p class="eyebrow">Ein Blick hinter die Kulissen</p><h1>Entwicklungsinfos</h1><p class="intro">Hier findest du Projekte, an denen das GoalNews-Team gerade arbeitet. Manche Ideen und Details können sich während der Entwicklung noch ändern.</p></section>
-    <h2 class="section-title">Daran wird gerade gearbeitet</h2>
-    <article class="project">
-      <div class="project-top"><h2>🏟️ Football-Liveticker</h2><span class="status"><i class="dot" aria-hidden="true"></i> In Entwicklung</span></div>
-      <p>Wir entwickeln aktuell einen Football-Liveticker für GoalNews. Ziel ist es, Football-Liveinformationen übersichtlich auf unserer Website darzustellen. Der Bereich ist noch in Arbeit; Funktionen und Gestaltung können sich bis zur Veröffentlichung verändern.</p>
-      <div class="project-note"><strong>Status:</strong> Aktive Entwicklung · Ein Veröffentlichungstermin steht noch nicht fest.</div>
-    </article>
+    <h2 class="section-title">Projekte</h2>
+    <div id="developmentProjects" class="project-list" aria-live="polite"><div class="loading">Entwicklungsprojekte werden geladen …</div></div>
     <section class="feedback"><p>Du hast eine Idee oder entdeckst einen Fehler in der Beta?<br>Deine Rückmeldung hilft uns bei der Weiterentwicklung.</p><a class="button" href="beta-bugs.html">Feedback senden&nbsp; ↗</a></section>
     <footer>GoalNews · Entwicklungsinfos · Angaben können sich während der Beta ändern.</footer>
   </main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
+      authDomain: "goalnewsde-community.firebaseapp.com",
+      projectId: "goalnewsde-community",
+      storageBucket: "goalnewsde-community.firebasestorage.app",
+      messagingSenderId: "134523022055",
+      appId: "1:134523022055:web:4f35ed7812d06e4fb55042"
+    };
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const labels = { planned: "Geplant", "in-progress": "In Entwicklung", done: "Erledigt" };
+    const target = document.getElementById("developmentProjects");
+    function safeLink(value) {
+      if (typeof value !== "string" || !value.trim()) return null;
+      try { const url = new URL(value, location.href); return url.origin === location.origin || url.protocol === "https:" ? url.href : null; }
+      catch { return null; }
+    }
+    function formatDate(value) {
+      return value?.toDate ? value.toDate().toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }) : "Datum wird gespeichert …";
+    }
+    function renderProject(project) {
+      const article = document.createElement("article"); article.className = "project"; article.dataset.status = labels[project.status] ? project.status : "planned";
+      const top = document.createElement("div"); top.className = "project-top";
+      const heading = document.createElement("h2"); heading.textContent = project.title || "Projekt";
+      const badge = document.createElement("span"); badge.className = "status";
+      const dot = document.createElement("i"); dot.className = "dot"; dot.setAttribute("aria-hidden", "true");
+      badge.append(dot, document.createTextNode(labels[project.status] || "Geplant")); top.append(heading, badge);
+      const description = document.createElement("p"); description.textContent = project.description || "";
+      const note = document.createElement("div"); note.className = "project-note";
+      const date = document.createElement("span"); date.textContent = `Angelegt: ${formatDate(project.createdAt)} · zuletzt geändert: ${formatDate(project.updatedAt || project.createdAt)}`; note.appendChild(date);
+      const href = safeLink(project.link);
+      if (href) {
+        const link = document.createElement("a"); link.href = href; link.textContent = "  ·  Projekt ansehen ↗";
+        if (new URL(href).origin !== location.origin) { link.target = "_blank"; link.rel = "noopener noreferrer"; }
+        note.appendChild(link);
+      }
+      article.append(top, description, note); return article;
+    }
+    async function loadProjects() {
+      try {
+        const snapshot = await getDocs(collection(db, "developmentProjects"));
+        const projects = snapshot.docs.map(item => item.data());
+        projects.sort((a,b) => {
+          const priority = { "in-progress": 0, planned: 1, done: 2 };
+          return (priority[a.status] ?? 1) - (priority[b.status] ?? 1) || (b.updatedAt?.toMillis?.() || 0) - (a.updatedAt?.toMillis?.() || 0);
+        });
+        target.replaceChildren();
+        if (!projects.length) {
+          const empty = document.createElement("div"); empty.className = "loading"; empty.textContent = "Aktuell sind keine Entwicklungsprojekte eingetragen."; target.appendChild(empty); return;
+        }
+        projects.forEach(project => target.appendChild(renderProject(project)));
+      } catch (error) {
+        console.error("Entwicklungsinfos konnten nicht geladen werden", error);
+        const message = document.createElement("div"); message.className = "loading";
+        message.textContent = "Die Entwicklungsinfos sind gerade nicht verfügbar. Bitte später erneut versuchen."; target.replaceChildren(message);
+      }
+    }
+    loadProjects();
+  </script>
   <script src="beta-banner.js"></script>
 </body>
 </html>
