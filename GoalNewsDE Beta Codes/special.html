@@ -3,72 +3,33 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GoalNews – Moderner Benutzer Dashboard</title>
-
-<!-- Poppins -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<title>GoalNews – Dashboard</title>
 
 <style>
-:root{
-  --bg:#f4f7f9;
-  --card:#ffffff;
-  --accent:#1db954;
-  --accent-dark:#169b48;
-  --gold:#ffd700;
-  --muted:#9aa6b2;
-  --glass: rgba(255,255,255,0.6);
-  --shadow: 0 8px 24px rgba(16,24,40,0.08);
-  --radius: 12px;
-}
-
-*{box-sizing:border-box;font-family:"Poppins",sans-serif}
-html,body{height:100%;margin:0;background:var(--bg);color:#122;}
-.app { display:flex; gap:24px; padding:28px; max-width:1200px; margin:18px auto; }
-.sidebar { width:90px; min-width:90px; background:linear-gradient(180deg,#fff,#f7fbf7); border-radius:14px; padding:12px; box-shadow:var(--shadow); display:flex; flex-direction:column; align-items:center; gap:12px; }
-.logoSmall{font-size:22px}
-.iconBtn{ width:56px;height:56px;border-radius:10px;background:var(--card); display:flex;align-items:center;justify-content:center;cursor:pointer; box-shadow:0 6px 18px rgba(16,24,40,0.06);transition:transform .14s; position:relative;}
-.iconBtn:hover{transform:translateY(-4px)}
-.iconBtn .badge{ position:absolute;margin-top:-30px;margin-left:18px;background:#ff3b30;color:white;border-radius:8px;padding:2px 6px;font-size:12px;}
-.main { flex:1; display:flex;flex-direction:column;gap:18px; }
-.topbar { display:flex;align-items:center;justify-content:space-between;gap:16px; }
-.profileHeader{ display:flex;align-items:center;gap:16px; background:linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95)); padding:14px;border-radius:14px;box-shadow:var(--shadow); }
-.avatar{ width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent-dark)); display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;box-shadow:0 8px 18px rgba(29,185,84,0.18); overflow:hidden; }
-.avatar img{ width:100%; height:100%; object-fit:cover; border-radius:18px; }
-.profileInfo h3{margin:0;font-size:18px}
-.profileInfo p{margin:2px 0 0 0;color:var(--muted);font-size:13px}
-.grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-.card{ background:var(--card); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow); transition:transform .12s, box-shadow .12s; }
-.card:hover{transform:translateY(-6px)}
-.card.h2{display:flex;align-items:center;justify-content:space-between}
-.card .title{font-weight:600;color:#122}
-.small{font-size:13px;color:var(--muted)}
-.coinsBig{display:flex;align-items:center;gap:12px}
-.coinBadge{ width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg,var(--gold), #ffd24d); display:flex;align-items:center;justify-content:center;font-weight:800;color:#4b3b00;font-size:20px; box-shadow:0 8px 22px rgba(255,203,54,0.2); }
-.row{display:flex;gap:10px;align-items:center}
-.btn{ background:var(--accent);color:white;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600; }
-.btn.ghost{background:transparent;border:1px solid #e6eef0;color:#122}
-.btn.warn{background:#ff6b6b}
-.input{ width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef0;background:#fbfeff; }
-.messages{max-height:160px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
-.msg{padding:8px 10px;border-radius:10px;background:#f3fbf5;color:#0b3a19;align-self:flex-start;max-width:70%}
-.msg.admin{background:#eef2f8;color:#08233a;align-self:flex-end}
-.adminPanel{display:flex;gap:12px;flex-wrap:wrap}
-.user-card { background:#fffef6;border-left:4px solid var(--gold);padding:10px;border-radius:10px;cursor:pointer;min-width:170px; }
-.footer{ text-align:center;color:var(--muted);font-size:13px;padding:12px; margin-top:10px; }
-@media(max-width:940px){ .grid{grid-template-columns:repeat(2,1fr)} .sidebar{display:none} }
-@media(max-width:600px){ .grid{grid-template-columns:1fr} .profileHeader{flex-direction:column;align-items:flex-start} }
-.spin { animation: spin .6s linear; }
-@keyframes spin { 0%{transform:rotate(0)}100%{transform:rotate(360deg)} }
-.levelBar{height:10px;background:#eef6f0;border-radius:8px;overflow:hidden}
-.levelBar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));width:40%}
-.badges{display:flex;gap:6px;flex-wrap:wrap}
-.badge{ background:linear-gradient(180deg,#fff8e0,#fff0b3);padding:6px 8px;border-radius:10px;font-weight:700;color:#4b3b00;font-size:12px; }
-.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
-.shop-item{padding:12px;border:1px solid #e9eef0;border-radius:12px;background:#fbfdfb}
-.shop-item strong{display:block;margin-bottom:4px}
-.shop-item .btn{width:100%;margin-top:10px}
-.notification-card{grid-column:span 3}
-@media(max-width:600px){.notification-card{grid-column:span 1}.app{padding:14px}.card[style*="span 3"]{grid-column:span 1!important}}
+:root{--bg:#080f1b;--card:#101a29;--card2:#142235;--accent:#c8f279;--accent-dark:#a9df59;--gold:#f2c75c;--muted:#aab7c8;--line:#ffffff18;--shadow:0 16px 40px #0003;--radius:15px}
+*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+html,body{min-height:100%;margin:0;background:radial-gradient(ellipse at 50% -15%,#17365a 0,transparent 48%),var(--bg);color:#f4f7fb}
+.app{display:flex;gap:20px;padding:24px;max-width:1280px;margin:0 auto}
+.sidebar{width:76px;min-width:76px;align-self:flex-start;position:sticky;top:18px;background:#0b1422;border:1px solid var(--line);border-radius:16px;padding:12px 9px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:10px}
+.logoSmall{font-size:19px;font-weight:900;letter-spacing:-.05em;color:var(--accent);padding:4px 0 8px}
+.iconBtn{width:48px;height:48px;border:1px solid #ffffff13;border-radius:12px;background:#101a29;color:#e3edf6;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .16s,border-color .16s,background .16s;position:relative}
+.iconBtn:hover{transform:translateY(-2px);border-color:#c8f27966;background:#c8f27912}.iconBtn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+.iconBtn .badge{position:absolute;top:1px;right:0;background:#e45454;color:white;border-radius:8px;padding:2px 5px;font-size:10px}
+.main{min-width:0;flex:1;display:flex;flex-direction:column;gap:16px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.profileHeader{display:flex;align-items:center;gap:16px;background:linear-gradient(110deg,#142235,#101a29);padding:16px;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.avatar{width:68px;height:68px;flex:0 0 auto;border-radius:18px;background:linear-gradient(135deg,#c8f279,#71ac44);display:flex;align-items:center;justify-content:center;color:#102013;font-weight:800;font-size:20px;box-shadow:0 8px 20px #a5d83d24;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover;border-radius:18px}
+.profileInfo h3{margin:0;font-size:18px}.profileInfo p{margin:3px 0 0;color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.card{min-width:0;background:linear-gradient(145deg,#142235,#101a29);border:1px solid var(--line);border-radius:var(--radius);padding:17px;box-shadow:0 12px 30px #0002;transition:transform .16s,border-color .16s}.card:hover{transform:translateY(-2px);border-color:#ffffff2a}.card.h2{display:flex;align-items:center;justify-content:space-between}.card .title{font-weight:750;color:#f4f7fb}.small{font-size:13px;color:var(--muted);line-height:1.5}
+.coinsBig{display:flex;align-items:center;gap:12px}.coinBadge{width:58px;height:58px;flex:0 0 auto;border-radius:15px;background:linear-gradient(135deg,#f6d77c,#d6a934);display:flex;align-items:center;justify-content:center;font-weight:850;color:#34270a;font-size:19px;box-shadow:0 8px 20px #d6a93420}
+.row{display:flex;gap:10px;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(110deg,#d8ff91,#a9df59);color:#12200e;padding:10px 13px;border-radius:10px;border:1px solid transparent;cursor:pointer;font-weight:750;text-decoration:none;transition:filter .15s,transform .15s}.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}.btn:disabled{opacity:.48;cursor:not-allowed;transform:none}.btn.ghost{background:#ffffff08;border:1px solid #ffffff25;color:#e2eaf2}.btn.ghost:hover{border-color:#c8f27966;color:var(--accent2,#d8ff91)}.btn.warn{background:#8e3439;color:#fff}
+.input{width:100%;min-width:0;padding:11px 12px;border-radius:9px;border:1px solid #ffffff24;background:#091321;color:#f4f7fb;font:inherit}.input::placeholder{color:#8290a3}.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px #c8f2791c}
+.messages{max-height:170px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px}.msg{padding:9px 11px;border:1px solid #ffffff10;border-radius:11px;background:#182638;color:#dce8f2;align-self:flex-start;max-width:90%;overflow-wrap:anywhere}.msg.admin{border-color:#c8f27922;background:#c8f2790c;color:#e6f6d0;align-self:flex-end}
+.adminPanel{display:flex;gap:10px;flex-wrap:wrap}.user-card{background:#172538;border:1px solid #ffffff1a;border-left:3px solid var(--gold);padding:10px 12px;border-radius:10px;cursor:pointer;min-width:145px;color:#e4ebf4}.user-card:hover,.user-card.selected{border-color:#c8f27977;background:#c8f27910}
+.footer{text-align:center;color:#8290a3;font-size:13px;padding:13px;margin-top:6px}.spin{animation:spin .6s linear}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.levelBar{height:9px;background:#091321;border:1px solid #ffffff12;border-radius:8px;overflow:hidden}.levelBar>i{display:block;height:100%;background:linear-gradient(90deg,#a9df59,#d8ff91);width:40%}.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{background:#c8f27912;border:1px solid #c8f27935;padding:6px 8px;border-radius:9px;font-weight:750;color:#d8ff91;font-size:12px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px}.shop-item{padding:13px;border:1px solid #ffffff16;border-radius:12px;background:#0d1725}.shop-item strong{display:block;margin-bottom:5px}.shop-item .btn{width:100%;margin-top:10px}.notification-card{grid-column:span 3}.status-msg{color:#aab7c8;font-size:.86rem;line-height:1.5}
+@media(max-width:940px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar{display:none}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.profileHeader{flex-wrap:wrap;align-items:flex-start}.app{padding:14px}.notification-card{grid-column:span 1}.card[style*="span 3"]{grid-column:span 1!important}.profileHeader>div[style*="margin-left:auto"]{margin-left:0!important;width:100%;justify-content:flex-end}.profileHeader>div[style*="margin-top:8px"]{flex-wrap:wrap}.coinBadge{width:52px;height:52px}}
 </style>
 </head>
 <body>
@@ -231,7 +192,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:#122;}
       </div>
     </section>
 
-    <div class="footer card">© 2025 GoalNews · Sound by Pixabay · Merry Christmas 🎄</div>
+    <div class="footer card">© 2026 GoalNews · Dein persönliches Dashboard</div>
   </main>
 </div>
 
