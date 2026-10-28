@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1421"><title>GoalNews Beta · Fehler und Ideen</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080f1b;--panel:#101a29;--line:#ffffff18;--text:#f4f7fb;--muted:#aab7c8;--lime:#c8f279;--lime2:#d8ff91}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 50% -15%,#17365a 0,transparent 48%),var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{width:min(860px,calc(100% - 30px));margin:0 auto;padding:26px 0 48px}.back{color:var(--lime2);font-size:.9rem;font-weight:700;text-decoration:none}.back:hover{text-decoration:underline}
+    header{margin:22px 0;padding:clamp(23px,5vw,42px);border:1px solid var(--line);border-radius:21px;background:linear-gradient(135deg,#14253a,#101a29 65%);box-shadow:0 20px 55px #0004}
+    .eyebrow{margin:0 0 10px;color:var(--lime);font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{margin:0;font-size:clamp(1.9rem,5vw,3rem);letter-spacing:-.045em}header p{max-width:680px;margin:13px 0 0;color:#c5d0de;line-height:1.65}
+    .notice{margin:18px 0;padding:14px 16px;border:1px solid #e8b45b55;border-left:4px solid #e8b45b;border-radius:12px;background:#e8b45b10;color:#d8e0e8;font-size:.9rem;line-height:1.6}.notice strong{color:#f6d69b}
+    .panel{padding:clamp(20px,4vw,30px);border:1px solid var(--line);border-radius:19px;background:var(--panel);box-shadow:0 15px 42px #0003}
+    .tabs{display:flex;gap:9px;margin:0 0 23px}.tab{flex:1;min-height:43px;border:1px solid #ffffff22;border-radius:10px;background:#ffffff07;color:#cbd5e1;font:inherit;font-weight:750;cursor:pointer}.tab.active{border-color:#c8f27977;background:#c8f27914;color:var(--lime2)}
+    .form-section[hidden]{display:none}.form-section h2{margin:0 0 7px;font-size:1.2rem}.form-section>p{margin:0 0 18px;color:var(--muted);font-size:.9rem;line-height:1.55}
+    label{display:block;margin:14px 0 7px;color:#d8e2ed;font-size:.87rem;font-weight:750}input,select,textarea{display:block;width:100%;min-height:45px;padding:11px 13px;border:1px solid #ffffff24;border-radius:10px;outline:none;background:#091321;color:var(--text);font:inherit}textarea{min-height:145px;resize:vertical;line-height:1.5}input:focus,select:focus,textarea:focus{border-color:var(--lime);box-shadow:0 0 0 3px #c8f2791c}.hint{margin:6px 0 0;color:#8494a8;font-size:.78rem}
+    .submit{margin-top:18px;min-height:46px;padding:0 18px;border:0;border-radius:10px;background:linear-gradient(110deg,#d8ff91,#a9df59);color:#14200e;font:inherit;font-weight:850;cursor:pointer}.submit:disabled{opacity:.55;cursor:wait}.status{min-height:1.4em;margin:13px 0 0;color:#b8c5d2;font-size:.9rem}.status.error{color:#ffaaa0}.status.success{color:var(--lime2)}
+    .login-box{padding:18px;border:1px solid #ffffff20;border-radius:12px;background:#091321;color:#cbd5e1;line-height:1.6}.login-box a{color:var(--lime2);font-weight:800}
+    footer{padding:20px 0;color:#8290a3;text-align:center;font-size:.82rem}
+    @media(max-width:480px){.tabs{flex-direction:column}.wrap{padding-top:18px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <a class="back" href="index.html">← Zurück zur Startseite</a>
+    <header><p class="eyebrow">GoalNews · Beta-Feedback</p><h1>Fehler melden oder Idee teilen</h1><p>Deine Rückmeldung hilft dem Entwicklerteam, die Beta zu verbessern. Beschreibe kurz und sachlich, was passiert ist oder was du dir wünschst.</p></header>
+    <div class="notice"><strong>Bitte beachten:</strong> Einsendungen werden in der echten GoalNews-Datenbank gespeichert. Bitte keine Passwörter, privaten Daten oder Spam eintragen. Die Meldungen können nur von Admins gelesen werden.</div>
+    <section class="panel">
+      <div id="loginBox" class="login-box" hidden>Zum Senden brauchst du ein angemeldetes GoalNews-Konto. <a href="login.html">Jetzt anmelden</a>.</div>
+      <div id="forms" hidden>
+        <div class="tabs" role="tablist" aria-label="Art der Rückmeldung">
+          <button class="tab active" id="bugTab" type="button" role="tab" aria-selected="true">🐞 Fehler melden</button>
+          <button class="tab" id="ideaTab" type="button" role="tab" aria-selected="false">💡 Idee teilen</button>
+        </div>
+        <section class="form-section" id="bugForm" role="tabpanel" aria-labelledby="bugTab">
+          <h2>Was ist schiefgelaufen?</h2><p>Hilf uns, den Fehler nachzustellen. Schreibe dazu, auf welcher Seite du warst und welche Schritte zum Problem geführt haben.</p>
+          <label for="bugType">Art des Fehlers</label><select id="bugType"><option>Anzeigeproblem</option><option>Falsche Information</option><option>Funktion funktioniert nicht</option><option>Login- oder Kontoproblem</option><option>Anderes</option></select>
+          <label for="bugDescription">Beschreibung</label><textarea id="bugDescription" maxlength="3000" placeholder="Was hast du gemacht? Was ist passiert? Was hättest du erwartet?"></textarea><p class="hint">Maximal 3000 Zeichen. Bitte keine Passwörter oder privaten Daten angeben.</p>
+          <button class="submit" id="sendBug" type="button">Fehlerbericht senden</button><p class="status" id="bugStatus" aria-live="polite"></p>
+        </section>
+        <section class="form-section" id="ideaForm" role="tabpanel" aria-labelledby="ideaTab" hidden>
+          <h2>Welche Idee hast du?</h2><p>Schlage eine Verbesserung oder neue Funktion vor. Je konkreter die Idee, desto besser können wir sie einschätzen.</p>
+          <label for="ideaTitle">Kurzer Titel</label><input id="ideaTitle" maxlength="120" placeholder="Zum Beispiel: Spielplan nach Datum filtern">
+          <label for="ideaDescription">Beschreibung</label><textarea id="ideaDescription" maxlength="3000" placeholder="Wie sollte es funktionieren und wem würde es helfen?"></textarea><p class="hint">Maximal 3000 Zeichen.</p>
+          <button class="submit" id="sendIdea" type="button">Idee senden</button><p class="status" id="ideaStatus" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
+    <footer>GoalNews Beta · Danke, dass du beim Testen hilfst ⚽</footer>
+  </main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    const config={apiKey:"AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",authDomain:"goalnewsde-community.firebaseapp.com",projectId:"goalnewsde-community",storageBucket:"goalnewsde-community.firebasestorage.app",messagingSenderId:"134523022055",appId:"1:134523022055:web:4f35ed7812d06e4fb55042"};
+    const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app);
+    const forms=document.getElementById("forms"),loginBox=document.getElementById("loginBox");
+    onAuthStateChanged(auth,user=>{const member=!!user&&!user.isAnonymous&&!!user.email;forms.hidden=!member;loginBox.hidden=member;});
+    const bugTab=document.getElementById("bugTab"),ideaTab=document.getElementById("ideaTab"),bugForm=document.getElementById("bugForm"),ideaForm=document.getElementById("ideaForm");
+    function selectTab(idea){bugForm.hidden=idea;ideaForm.hidden=!idea;bugTab.classList.toggle("active",!idea);ideaTab.classList.toggle("active",idea);bugTab.setAttribute("aria-selected",String(!idea));ideaTab.setAttribute("aria-selected",String(idea));}
+    bugTab.addEventListener("click",()=>selectTab(false));ideaTab.addEventListener("click",()=>selectTab(true));
+    async function submit(button,status,collectionName,data,reset){
+      if(!auth.currentUser||auth.currentUser.isAnonymous){status.textContent="Bitte melde dich zuerst an.";status.className="status error";return;}
+      button.disabled=true;status.textContent="Wird gesendet …";status.className="status";
+      try{await addDoc(collection(db,collectionName),{...data,created:serverTimestamp()});reset();status.textContent="Danke! Deine Meldung wurde an das GoalNews-Team gesendet.";status.className="status success";}
+      catch(error){console.error("Beta-Feedback konnte nicht gespeichert werden",error);status.textContent="Senden fehlgeschlagen. Bitte prüfe deine Anmeldung oder versuche es später erneut.";status.className="status error";}
+      finally{button.disabled=false;}
+    }
+    document.getElementById("sendBug").addEventListener("click",()=>{const description=document.getElementById("bugDescription").value.trim();if(!description){document.getElementById("bugStatus").textContent="Bitte beschreibe den Fehler.";document.getElementById("bugStatus").className="status error";return;}submit(document.getElementById("sendBug"),document.getElementById("bugStatus"),"reports",{type:document.getElementById("bugType").value,description},()=>document.getElementById("bugDescription").value="");});
+    document.getElementById("sendIdea").addEventListener("click",()=>{const title=document.getElementById("ideaTitle").value.trim(),description=document.getElementById("ideaDescription").value.trim();if(!title||!description){document.getElementById("ideaStatus").textContent="Bitte fülle Titel und Beschreibung aus.";document.getElementById("ideaStatus").className="status error";return;}submit(document.getElementById("sendIdea"),document.getElementById("ideaStatus"),"ideas",{title,description},()=>{document.getElementById("ideaTitle").value="";document.getElementById("ideaDescription").value="";});});
+  </script>
+  <script src="beta-banner.js"></script>
+</body>
+</html>
