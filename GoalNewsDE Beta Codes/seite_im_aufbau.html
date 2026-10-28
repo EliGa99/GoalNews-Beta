@@ -1,127 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🚧 Seite im Aufbau | GoalNews</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080f1b">
+  <meta name="description" content="Unser Team entwickelt etwas Neues für GoalNews. Hier findest du den aktuellen Status und hilfreiche Links.">
+  <title>Hier entsteht etwas Neues · GoalNews</title>
   <link rel="icon" href="https://i.ibb.co/21R6p75W/Logo-1.jpg" type="image/jpeg">
   <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: repeating-linear-gradient(
-        45deg,
-        #fdd835,
-        #fdd835 20px,
-        #000000 20px,
-        #000000 40px
-      );
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #222;
-      text-align: center;
-      overflow: hidden;
-    }
-
-    a {
-        text-decoration: none; /* entfernt die Unterstreichung */
-        font-weight: bold;     /* macht den Text fett */
-        color: #1db954;
-    }
-
-    .overlay {
-      background-color: rgba(255, 255, 255, 0.92);
-      border-radius: 20px;
-      padding: 40px 60px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-      position: relative;
-      z-index: 2;
-      animation: popIn 0.6s ease-in-out;
-    }
-
-    .logo {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      margin-bottom: 15px;
-    }
-
-    h1 {
-      font-size: 2.4rem;
-      margin-bottom: 10px;
-      color: #d32f2f;
-    }
-
-    p {
-      font-size: 1.1rem;
-      color: #444;
-    }
-
-    .loader {
-      margin-top: 30px;
-      width: 80px;
-      height: 80px;
-      border: 6px solid #fdd835;
-      border-top-color: #d32f2f;
-      border-radius: 50%;
-      animation: spin 1.3s linear infinite;
-    }
-
-    .warning {
-      font-size: 3rem;
-      animation: blink 1.2s infinite alternate;
-      margin-bottom: 10px;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 15px;
-      color: white;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px black;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes blink {
-      from {
-        opacity: 1;
-      }
-      to {
-        opacity: 0.3;
-      }
-    }
-
-    @keyframes popIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
+    :root{color-scheme:dark;--bg:#080f1b;--panel:#101a29;--line:#ffffff18;--text:#f4f7fb;--muted:#aab7c8;--lime:#c8f279;--lime2:#d8ff91}
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;display:flex;flex-direction:column;color:var(--text);background:radial-gradient(ellipse at 50% -15%,#17365a 0,transparent 48%),var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .page-main{width:100%;flex:1;display:grid;place-items:center;padding:clamp(22px,5vw,48px) 16px}
+    .layout{width:min(900px,100%)}
+    .hero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(28px,6vw,58px);border:1px solid #c8f2794b;border-radius:26px;background:linear-gradient(125deg,#14253a,#101a29 60%,#142235);box-shadow:0 26px 80px #0006}
+    .hero:before{content:"";position:absolute;z-index:-1;right:-110px;top:-150px;width:410px;height:410px;border:1px solid #c8f27920;border-radius:50%;box-shadow:0 0 0 35px #c8f27908,0 0 0 75px #c8f27905;pointer-events:none}
+    .hero:after{content:"⚽";position:absolute;z-index:-1;right:clamp(18px,7vw,80px);top:50%;transform:translateY(-50%) rotate(-13deg);font-size:clamp(5rem,16vw,10rem);opacity:.12;filter:drop-shadow(0 12px 34px #c8f27928);pointer-events:none}
+    .brandline{display:flex;align-items:center;gap:12px;margin-bottom:30px}.logo{width:49px;height:49px;object-fit:cover;border:2px solid #c8f27977;border-radius:15px;box-shadow:0 8px 24px #0004}.brandname{font-weight:850;letter-spacing:-.04em}.brandname span{color:var(--lime)}
+    .status{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;padding:8px 12px;border:1px solid #c8f27966;border-radius:999px;background:#c8f27915;color:var(--lime2);font-size:.76rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.status-dot{width:9px;height:9px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px #c8f2791f,0 0 15px #c8f279aa;animation:pulse 1.7s ease-in-out infinite}
+    h1{position:relative;max-width:720px;margin:0;font-size:clamp(2.3rem,7vw,4.5rem);letter-spacing:-.06em;line-height:.99}.accent{color:var(--lime)}.intro{position:relative;max-width:650px;margin:20px 0 0;color:#c4d0dd;font-size:clamp(1rem,2.3vw,1.12rem);line-height:1.7}.workline{display:flex;align-items:center;gap:11px;max-width:580px;margin-top:28px;padding:13px 15px;border:1px solid #ffffff1a;border-radius:13px;background:#07132188;color:#dce6ef;font-size:.9rem;font-weight:650}.work-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 auto;border:1px solid #c8f2793b;border-radius:10px;background:#c8f27912;font-size:1rem}.live-line{width:7px;height:7px;margin-left:auto;border-radius:50%;background:#8bd477;box-shadow:0 0 10px #8bd47799}
+    .section-title{margin:26px 2px 12px;font-size:1rem;color:#dce6ef}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.action-card{display:flex;min-height:114px;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:16px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#142235,#101a29);color:var(--text);text-decoration:none;transition:transform .16s,border-color .16s,background .16s}.action-card:hover{transform:translateY(-3px);border-color:#c8f27966;background:linear-gradient(145deg,#192b40,#101a29)}.action-icon{font-size:1.25rem}.action-title{font-size:.9rem;font-weight:800}.action-arrow{color:var(--lime2);font-size:.8rem}
+    .faq{margin-top:22px;padding:18px 20px;border:1px solid var(--line);border-radius:15px;background:#101a29}.faq-title{margin:0 0 7px;color:#e9f0f6;font-size:.96rem}.faq details{border-top:1px solid #ffffff12}.faq details:first-of-type{margin-top:12px}.faq summary{padding:13px 24px 13px 0;color:#d8ff91;font-size:.88rem;font-weight:750;cursor:pointer;list-style:none;position:relative}.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";position:absolute;right:2px;top:10px;color:var(--lime);font-size:1.2rem}.faq details[open] summary:after{content:"−"}.faq details p{margin:0;padding:0 0 13px;color:var(--muted);font-size:.86rem;line-height:1.6}
+    footer{padding:20px 12px 23px;color:#8290a3;text-align:center;font-size:.8rem}
+    @keyframes pulse{50%{opacity:.5;box-shadow:0 0 0 2px #c8f27912,0 0 5px #c8f27966}}
+    @media(max-width:700px){.actions{grid-template-columns:1fr}.action-card{min-height:78px;flex-direction:row;align-items:center;gap:12px}.action-arrow{margin-left:auto}.hero{border-radius:21px}.hero:after{right:8px;top:19%;font-size:5rem}.brandline{margin-bottom:24px}}
+    @media(max-width:430px){.page-main{padding:20px 12px}.hero{padding:25px 20px}.workline{font-size:.82rem}.faq{padding:16px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <div class="warning">⚠️</div>
-    <img src="https://i.ibb.co/21R6p75W/Logo-1.jpg" alt="GoalNews Logo" class="logo">
-    <h1>Seite im Aufbau</h1>
-    <p>Hier wird gerade gearbeitet!<br>
-    Bald gibt’s hier brandneue Inhalte von <b><a href="index.html">GoalNews</a></b></p>
-    <div class="loader"></div>
-  </div>
-  <footer>© 2025 GoalNews – Wartungsmodus aktiviert 🚧</footer>
+  <main class="page-main">
+    <div class="layout">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="brandline"><img src="https://i.ibb.co/21R6p75W/Logo-1.jpg" alt="" class="logo"><div class="brandname">Goal<span>News</span></div></div>
+        <div class="status"><span class="status-dot" aria-hidden="true"></span> Unser Team arbeitet daran</div>
+        <h1 id="page-title">Wir entwickeln<br><span class="accent">etwas Neues.</span></h1>
+        <p class="intro">Dieser Bereich ist noch nicht fertig. Unser Team arbeitet gerade an neuen Inhalten und Funktionen für GoalNews. Sobald es Neuigkeiten gibt, findest du sie hier.</p>
+        <div class="workline"><span class="work-icon" aria-hidden="true">🛠️</span><span>Hinter den Kulissen wird fleißig gebaut — danke für deine Geduld!</span><span class="live-line" aria-hidden="true"></span></div>
+      </section>
+
+      <h2 class="section-title">Was möchtest du in der Zwischenzeit tun?</h2>
+      <nav class="actions" aria-label="Weitere GoalNews-Seiten">
+        <a class="action-card" href="entwicklungs-infos.html"><span class="action-icon" aria-hidden="true">🚀</span><span class="action-title">Entwicklungsinfos</span><span class="action-arrow">Projekte ansehen&nbsp; ↗</span></a>
+        <a class="action-card" href="beta-bugs.html"><span class="action-icon" aria-hidden="true">💡</span><span class="action-title">Fehler oder Idee melden</span><span class="action-arrow">Feedback senden&nbsp; ↗</span></a>
+        <a class="action-card" href="index.html"><span class="action-icon" aria-hidden="true">⚽</span><span class="action-title">Zur Startseite</span><span class="action-arrow">GoalNews entdecken&nbsp; ↗</span></a>
+      </nav>
+
+      <section class="faq" aria-labelledby="faq-title">
+        <h2 class="faq-title" id="faq-title">Noch Fragen?</h2>
+        <details><summary>Wann ist der Bereich fertig?</summary><p>Ein Veröffentlichungstermin steht noch nicht fest. Wir möchten den Bereich erst freigeben, wenn die Inhalte bereit sind.</p></details>
+        <details><summary>Wie kann ich bei der Entwicklung helfen?</summary><p>Teile Fehler und Ideen über das Beta-Feedback mit. Bitte gib dort keine privaten oder sensiblen Informationen ein.</p></details>
+      </section>
+    </div>
+  </main>
+  <footer>GoalNews · © 2026 · Danke, dass du die Beta begleitest.</footer>
   <script src="beta-banner.js"></script>
 </body>
 </html>
