@@ -1,4 +1,3 @@
-javascript;
 import {
   currentSeasonStart,
   fetchJsonCached,
