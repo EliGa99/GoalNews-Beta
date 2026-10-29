@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080f1b">
+<meta name="description" content="Die nächsten Spieltage der 1. und 2. Bundesliga mit aktuellen Anstoßzeiten.">
+<title>Nächste Spieltage | GoalNews</title>
+<link rel="stylesheet" href="ligatabelle.css">
+<style>
+.fixture-groups{display:grid;gap:12px;padding:14px}.matchday{overflow:hidden;border:1px solid #ffffff14;border-radius:14px;background:#ffffff04}.matchday h3{margin:0;padding:12px 14px;border-bottom:1px solid #ffffff12;color:#d8ff91;font-size:.9rem}.match-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid #ffffff0d}.match-row:last-child{border-bottom:0}.match-date{color:#aebcd0;font-size:.76rem;line-height:1.45}.match-teams{font-weight:700;line-height:1.45}.match-location{margin-top:3px;color:#8796aa;font-size:.72rem}.status{color:#93a3b8;font-size:.8rem}.league-grid{display:grid;gap:22px}.source{margin-top:18px;color:#91a0b4;font-size:.78rem;line-height:1.6}.source a{color:#d8ff91}@media(max-width:560px){.match-row{grid-template-columns:1fr;gap:4px}.fixture-groups{padding:10px}}
+</style>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="index.html">Goal<span>News</span></a><nav class="site-nav" aria-label="Hauptnavigation"><a href="index.html">Startseite</a><a href="bundesliga.html">1. Bundesliga</a><a href="2liga.html">2. Bundesliga</a></nav></header>
+<main>
+<section class="hero"><div><p class="eyebrow">Spielplan im Überblick</p><h1>Nächste Spieltage</h1><p class="season">Kommende Partien aus der 1. und 2. Bundesliga</p></div></section>
+<div class="league-grid">
+<section class="panel"><div class="panel-head"><h2>1. Bundesliga</h2><span class="updated status" id="status-bl1">Spielplan wird geladen …</span></div><div class="fixture-groups" id="fixtures-bl1"><p class="state">Spielplan wird geladen …</p></div></section>
+<section class="panel"><div class="panel-head"><h2>2. Bundesliga</h2><span class="updated status" id="status-bl2">Spielplan wird geladen …</span></div><div class="fixture-groups" id="fixtures-bl2"><p class="state">Spielplan wird geladen …</p></div></section>
+</div>
+<p class="source">Spielplandaten: <a href="https://www.openligadb.de/" target="_blank" rel="noopener noreferrer">OpenLigaDB</a> · <a href="https://www.openligadb.de/lizenz" target="_blank" rel="noopener noreferrer">ODbL 1.0</a>. Die Daten werden im Browser fünf Minuten zwischengespeichert.</p>
+</main>
+<footer class="footer">© 2026 GoalNews · <a href="index.html">Zurück zur Startseite</a></footer>
+<script type="module">
+import {fetchJsonCached,currentSeasonStart,formatUpdatedAt} from "./data-cache.js";
+const season=currentSeasonStart();
+function renderMessage(container,text,error=false){const p=document.createElement("p");p.className=error?"state error":"state";p.textContent=text;container.replaceChildren(p)}
+function renderLeague(league,data,updated){const container=document.getElementById(`fixtures-${league}`),status=document.getElementById(`status-${league}`),now=Date.now();const future=(Array.isArray(data)?data:[]).filter(match=>new Date(match.matchDateTime).getTime()>=now).sort((a,b)=>new Date(a.matchDateTime)-new Date(b.matchDateTime));if(!future.length){renderMessage(container,"Für diese Liga sind derzeit keine kommenden Spiele eingetragen.");status.textContent=`Saison ${season}/${season+1} · Stand ${formatUpdatedAt(updated.updatedAt)}`;return}
+ const groups=[];const groupKeys=new Set();for(const match of future){const key=match.group?.groupOrderID??match.group?.groupName??"Spieltag offen";if(!groupKeys.has(key)){if(groups.length>=2)break;groupKeys.add(key);groups.push(key)}}
+ const selected=future.filter(match=>groups.includes(match.group?.groupOrderID??match.group?.groupName??"Spieltag offen"));container.replaceChildren();for(const key of groups){const matches=selected.filter(match=>(match.group?.groupOrderID??match.group?.groupName??"Spieltag offen")===key);const section=document.createElement("section");section.className="matchday";const heading=document.createElement("h3");heading.textContent=matches[0]?.group?.groupName||`Spieltag ${key}`;section.appendChild(heading);for(const match of matches){const row=document.createElement("article");row.className="match-row";const date=document.createElement("time");date.className="match-date";date.dateTime=match.matchDateTime;date.textContent=new Date(match.matchDateTime).toLocaleString("de-DE",{weekday:"short",day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});const details=document.createElement("div");const teams=document.createElement("div");teams.className="match-teams";teams.textContent=`${match.team1?.teamName||"TBD"} – ${match.team2?.teamName||"TBD"}`;details.appendChild(teams);if(match.location?.locationCity){const location=document.createElement("div");location.className="match-location";location.textContent=match.location.locationCity;details.appendChild(location)}row.append(date,details);section.appendChild(row)}container.appendChild(section)}status.textContent=`Saison ${season}/${season+1} · ${groups.length} Spieltage · Stand ${formatUpdatedAt(updated.updatedAt)}${updated.stale?" · gespeicherter Stand":""}`}
+async function loadLeague(league){const container=document.getElementById(`fixtures-${league}`),status=document.getElementById(`status-${league}`);try{const result=await fetchJsonCached(`https://api.openligadb.de/getmatchdata/${league}/${season}`,{ttlMs:5*60*1000});renderLeague(league,result.data,result)}catch(error){console.error(`Spielplan ${league} nicht verfügbar`,error);renderMessage(container,"Spielplan momentan nicht erreichbar. Bitte später erneut laden.",true);status.textContent="Keine gespeicherten Daten verfügbar"}}
+Promise.all([loadLeague("bl1"),loadLeague("bl2")]);
+</script><script src="beta-banner.js"></script>
+</body></html>
