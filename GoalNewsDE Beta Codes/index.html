@@ -215,6 +215,12 @@
       width: 100%;
     }
   }
+    .friend-request-pop { position:fixed; z-index:1200; right:20px; bottom:20px; width:min(420px,calc(100vw - 28px)); padding:18px; border:1px solid #c8f27977; border-radius:16px; background:#101d2b; color:#f4f7fb; box-shadow:0 18px 55px #0009; }
+    .friend-request-pop[hidden] { display:none; }
+    .friend-request-pop strong { display:block; margin:0 28px 5px 0; color:#d8ff91; }
+    .friend-request-pop p { margin:0 0 12px; color:#c3cfdd; font-size:.9rem; line-height:1.45; }
+    .friend-request-pop a { display:inline-flex; padding:9px 12px; border-radius:9px; background:#c8f279; color:#142019; font-weight:800; text-decoration:none; }
+    .friend-request-close { position:absolute; top:9px; right:10px; width:34px; height:34px; border:0; background:transparent; color:#dce5ee; font-size:1.2rem; cursor:pointer; }
 </style>
 
 </head>
@@ -245,6 +251,7 @@
           <li><a href="bundesliga.html">Bundesliga</a></li>
           <li><a href="2liga.html">2. Bundesliga</a></li>
           <li><a href="football.html">Football</a></li>
+          <li><a href="freunde.html">Freunde &amp; Spieltipps</a></li>
           <li><a href="verein-news.html">Mein Verein · Updates</a></li>
           <li><a href="komments.html">Kommentar Forum</a></li>
           <li><a href="bewertungen.html">Bewertungen</a></li>
@@ -253,6 +260,13 @@
         </ul>
       </nav>
     </header>
+
+    <aside id="friendRequestNotice" class="friend-request-pop" hidden aria-live="polite">
+      <button id="friendRequestClose" class="friend-request-close" type="button" aria-label="Hinweis schließen">×</button>
+      <strong>Neue Freundschaftsanfrage</strong>
+      <p id="friendRequestText"></p>
+      <a href="freunde.html">Anfragen ansehen</a>
+    </aside>
 
     <aside class="beta-feedback-quick" aria-label="Beta-Feedback">
       <div><strong>🧪 GoalNews Beta: Fehler oder Idee?</strong><span>Hilf uns, Probleme zu finden und die Seite zu verbessern.</span></div>
@@ -339,6 +353,12 @@
         getFirestore,
         collection,
         doc,
+        getDoc,
+        setDoc,
+        serverTimestamp,
+        query,
+        where,
+        limit,
         onSnapshot,
       } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
       import {
@@ -367,6 +387,10 @@
       const favoriteGameText = document.getElementById("favoriteGameText");
       let observedFavoriteTeam = null;
       let favoriteGameTimer = null;
+      let stopFriendRequests = null;
+      let syncedFriendProfileName = "";
+      let dismissedRequestIds = new Set();
+      let incomingRequestIds = [];
 
       function normalizeTeamName(value) {
         return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("de").replace(/[^a-z0-9]/g, "");
@@ -420,7 +444,13 @@
       // ===== Breaking News Toggle =====
       const breakingEl = document.getElementById("breakingNews");
       const userGreeting = document.getElementById("userGreeting");
+      const friendRequestNotice = document.getElementById("friendRequestNotice");
       onAuthStateChanged(auth, (user) => {
+        if (stopFriendRequests) { stopFriendRequests(); stopFriendRequests = null; }
+        syncedFriendProfileName = "";
+        dismissedRequestIds = new Set();
+        incomingRequestIds = [];
+        friendRequestNotice.hidden = true;
         if (!user || user.isAnonymous) {
           userGreeting.hidden = true;
           userGreeting.textContent = "";
@@ -438,6 +468,16 @@
           const data = snap.data() || {};
           const username = String(data.username || user.displayName || user.email?.split("@")[0] || "Fußballfan").slice(0, 40);
           userGreeting.textContent = `Hallo, ${username}`;
+          if (username && username !== syncedFriendProfileName) {
+            syncedFriendProfileName = username;
+            const profileRef = doc(db, "friendProfiles", user.uid);
+            getDoc(profileRef).then(profileSnap => {
+              const lower = username.toLowerCase();
+              if (!profileSnap.exists() || profileSnap.data().username !== username || profileSnap.data().usernameLower !== lower) {
+                return setDoc(profileRef, { uid: user.uid, username, usernameLower: lower, updatedAt: serverTimestamp() }, { merge: true });
+              }
+            }).catch(error => console.warn("Freundesuche-Profil konnte auf der Startseite nicht synchronisiert werden.", error));
+          }
           breakingEl.classList.toggle("locked", !data.breakingNews);
           const team = String(data.favTeam || "").trim();
           if (team !== observedFavoriteTeam) {
@@ -447,6 +487,21 @@
             favoriteGameTimer = window.setInterval(() => updateFavoriteGameNotice(observedFavoriteTeam), 5 * 60 * 1000);
           }
         });
+        const requestQuery = query(collection(db, "friendships"), where("members", "array-contains", user.uid), limit(60));
+        stopFriendRequests = onSnapshot(requestQuery, snapshot => {
+          const incoming = snapshot.docs.filter(item => item.data().toUid === user.uid && item.data().status === "pending");
+          const ids = new Set(incoming.map(item => item.id));
+          incomingRequestIds = [...ids];
+          const newIds = [...ids].filter(id => !dismissedRequestIds.has(id));
+          if (incoming.length) {
+            document.getElementById("friendRequestText").textContent = incoming.length === 1 ? "Du hast eine neue Anfrage." : `Du hast ${incoming.length} offene Anfragen.`;
+            friendRequestNotice.hidden = newIds.length === 0;
+          } else { friendRequestNotice.hidden = true; dismissedRequestIds.clear(); }
+        }, error => console.warn("Freundschaftsanfragen konnten nicht geladen werden.", error));
+      });
+      document.getElementById("friendRequestClose").addEventListener("click", () => {
+        friendRequestNotice.hidden = true;
+        incomingRequestIds.forEach(id => dismissedRequestIds.add(id));
       });
 
       // ===== Live Games Rendering =====
