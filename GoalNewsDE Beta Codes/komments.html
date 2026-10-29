@@ -36,6 +36,10 @@
     .reaction-bar { display:flex; gap:6px; flex-wrap:wrap; }
     .reaction-bar span { padding:4px 8px; border:1px solid #ffffff14; border-radius:999px; background:#ffffff07; color:#cad5e2; font-size:.78rem; }
     .react-btn { padding:6px 9px; border:1px solid #ffffff19; border-radius:8px; background:#ffffff07; color:#c8f279; font:inherit; font-size:.78rem; cursor:pointer; }
+    .report-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .report-btn { padding:6px 9px; border:1px solid #ffffff19; border-radius:8px; background:#ffffff07; color:#c5cfdd; font:inherit; font-size:.76rem; cursor:pointer; }
+    .report-btn:hover { border-color:#ffb36b88; color:#ffd0a2; }
+    .report-btn:disabled { opacity:.5; cursor:not-allowed; }
     .delete-btn { position:absolute; top:12px; right:12px; padding:5px 7px; border:0; border-radius:7px; background:#ff6b6b16; color:#ff9e9e; cursor:pointer; }
     .reaction-popup { position:fixed; z-index:100; display:flex; gap:6px; padding:8px; border:1px solid #ffffff20; border-radius:13px; background:#101b29; box-shadow:0 12px 35px #0008; }
     .reaction-popup button { padding:5px 7px; border:0; border-radius:8px; background:#ffffff0b; font-size:1.1rem; cursor:pointer; }
@@ -88,7 +92,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, serverTimestamp, query, orderBy, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, deleteDoc, doc, serverTimestamp, query, orderBy, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",
@@ -105,6 +109,45 @@
     const sendComment = document.getElementById("sendComment");
     const commentsContainer = document.getElementById("commentsContainer");
     const authHint = document.getElementById("authHint");
+    let latestCommentsSnapshot = null;
+
+    async function reportCommunityItem(targetType, targetId, targetUserId, targetName, targetText = "") {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Bitte melde dich an, um Inhalte zu melden.");
+        window.location.href = "login.html";
+        return;
+      }
+      if (targetUserId === user.uid) {
+        alert("Eigene Inhalte kannst du nicht melden.");
+        return;
+      }
+      const reason = prompt("Meldegrund: Beleidigung, Spam, unangemessener Inhalt oder Sonstiges");
+      if (!reason || !reason.trim()) return;
+      const details = prompt("Optionale Zusatzinfo (Abbrechen oder leer lassen zum Überspringen):") || "";
+      const safeId = String(targetId).replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 100);
+      const reportId = `${user.uid}_${targetType}_${safeId}`;
+      try {
+        await setDoc(doc(db, "reports", reportId), {
+          type: targetType === "comment" ? "Kommentarmeldung" : "Kontomeldung",
+          description: details.trim().slice(0, 1000) || reason.trim().slice(0, 1000),
+          created: serverTimestamp(),
+          targetType,
+          targetId: String(targetId).slice(0, 150),
+          targetUserId: String(targetUserId || "").slice(0, 128),
+          targetName: String(targetName || "GoalNews-Mitglied").slice(0, 40),
+          targetText: String(targetText || "").slice(0, 1500),
+          reason: reason.trim().slice(0, 120),
+          reporterUid: user.uid
+        });
+        alert("Danke, deine Meldung wurde an das GoalNews-Team übermittelt.");
+      } catch (error) {
+        console.error("Meldung konnte nicht gespeichert werden:", error);
+        alert(error.code === "permission-denied"
+          ? "Die Meldung konnte wegen der Firestore-Regeln nicht gespeichert werden. Bitte veröffentliche zuerst die aktualisierten Regeln."
+          : "Die Meldung konnte gerade nicht gespeichert werden. Bitte versuche es später erneut.");
+      }
+    }
 
     sendComment.addEventListener("click", async () => {
       const user = auth.currentUser;
@@ -185,7 +228,22 @@
         reactButton.textContent = "Reaktionen pausiert";
         reactButton.disabled = true;
         reactButton.title = "Reaktionen sind vorübergehend deaktiviert, damit Zähler nicht manipuliert werden können.";
-        tools.append(reactions, reactButton);
+        const reportActions = document.createElement("div");
+        reportActions.className = "report-actions";
+        if (user && data.userId !== user.uid) {
+          const reportComment = document.createElement("button");
+          reportComment.type = "button";
+          reportComment.className = "report-btn";
+          reportComment.textContent = "Kommentar melden";
+          reportComment.addEventListener("click", () => reportCommunityItem("comment", commentDoc.id, data.userId, username, data.text));
+          const reportAccount = document.createElement("button");
+          reportAccount.type = "button";
+          reportAccount.className = "report-btn";
+          reportAccount.textContent = "Konto melden";
+          reportAccount.addEventListener("click", () => reportCommunityItem("account", data.userId, data.userId, username));
+          reportActions.append(reportComment, reportAccount);
+        }
+        tools.append(reactions, reactButton, reportActions);
         card.append(head, message, tools);
 
         if (user && data.userId === user.uid) {
@@ -205,7 +263,10 @@
     }
 
     const commentsQuery = query(collection(db, "comments"), orderBy("created", "desc"));
-    onSnapshot(commentsQuery, snapshot => renderComments(snapshot), error => {
+    onSnapshot(commentsQuery, snapshot => {
+      latestCommentsSnapshot = snapshot;
+      renderComments(snapshot);
+    }, error => {
       console.error("Kommentare konnten nicht geladen werden:", error);
       commentsContainer.textContent = "Kommentare sind gerade nicht erreichbar.";
     });
@@ -220,8 +281,8 @@
         login.textContent = "anmelden";
         authHint.append(login, document.createTextNode("."));
       }
+      if (latestCommentsSnapshot) renderComments(latestCommentsSnapshot);
     });
   </script>
-  <script src="beta-banner.js"></script>
 </body>
 </html>
