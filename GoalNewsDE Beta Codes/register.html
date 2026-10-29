@@ -71,6 +71,8 @@
       .link { display: inline-block; margin-top: 20px; color: #c5ee8a; font-size: .92rem; font-weight: 700; text-decoration: none; transition: color .18s; }
       .link:hover { color: #e4ffb5; text-decoration: underline; }
       .auth-switch { margin-top: 20px; color: #aeb9c8; font-size: .9rem; line-height: 1.6; }
+      .success-note { display:none; margin:0 0 18px; padding:12px 14px; border:1px solid #b9e87555; border-radius:11px; background:#b9e87512; color:#d8ff91; font-size:.9rem; line-height:1.5; text-align:left; }
+      .success-note.visible { display:block; }
       .home-link { display: inline-block; margin-top: 18px; color: #c5ee8a; font-size: .86rem; font-weight: 750; text-decoration: none; }
       .home-link:hover { color: #e4ffb5; text-decoration: underline; }
       .email-optin { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 4px; color: #b7c3d0; text-align: left; font-size: .83rem; line-height: 1.45; }
@@ -82,6 +84,7 @@
   <body>
     <div class="container">
       <h2>Registrieren</h2>
+      <p class="success-note" id="deletedAccountNotice" role="status">Dein altes Konto wurde gelöscht. Du kannst jetzt ein neues GoalNews-Konto erstellen.</p>
 
       <input id="email" type="email" placeholder="E-Mail" />
       <div class="input-wrapper">
@@ -126,6 +129,10 @@
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
+
+      if (new URLSearchParams(location.search).get("accountDeleted") === "1") {
+        document.getElementById("deletedAccountNotice").classList.add("visible");
+      }
 
       const toggle = document.getElementById("togglePwd");
       const pwd = document.getElementById("password");
@@ -182,6 +189,5 @@
         }
       };
     </script>
-    <script src="beta-banner.js"></script>
-</body>
+  </body>
 </html>
