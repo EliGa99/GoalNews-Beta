@@ -1,109 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gesperrt</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
-  body, html {
-    height: 100%;
-    margin: 0;
-    font-family: 'Share Tech Mono', monospace;
-    background: radial-gradient(circle at center, #000000, #111111);
-    color: #00ff00;
-    overflow: hidden;
-  }
-
-  .matrix {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .matrix span {
-    display: block;
-    position: absolute;
-    bottom: 100%;
-    font-size: 16px;
-    animation: fall 3s linear infinite;
-  }
-
-  @keyframes fall {
-    0% { transform: translateY(0); opacity: 1; }
-    100% { transform: translateY(110vh); opacity: 0; }
-  }
-
-  .ban-message {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    background: rgba(0,0,0,0.7);
-    padding: 40px;
-    border: 2px solid #00ff00;
-    border-radius: 15px;
-    box-shadow: 0 0 30px #00ff00;
-  }
-
-  .ban-message h1 {
-    font-size: 3em;
-    margin: 0 0 20px 0;
-    color: #ff0000;
-    text-shadow: 0 0 10px red;
-  }
-
-  .ban-message p {
-    font-size: 1.2em;
-    margin: 10px 0;
-    color: #00ff00;
-  }
-
-  .ban-message .subtext {
-    font-size: 0.9em;
-    color: #888;
-    margin-top: 20px;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111b">
+  <title>Kontozugriff pausiert · GoalNews</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080f1b;--panel:#101a29;--line:#ffffff18;--text:#f4f7fb;--muted:#aab7c8;--green:#c8f279;--green-soft:#d8ff91}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% -12%,#1b3e5d 0,transparent 52%),var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+    .shell{width:min(680px,100%)}.brand{display:flex;align-items:center;gap:10px;margin:0 0 18px 4px;color:#edf5fb;font-size:1.02rem;font-weight:850;letter-spacing:-.03em}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #c8f27955;border-radius:10px;background:#c8f27912;color:var(--green);font-size:1rem}
+    .card{position:relative;overflow:hidden;padding:clamp(24px,6vw,48px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#142235f2,#101a29f5);box-shadow:0 28px 80px #0006}.card:before{position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#c8f279,#81b83f,#c8f279);content:""}
+    .icon{display:grid;place-items:center;width:62px;height:62px;border:1px solid #ffb46b55;border-radius:18px;background:#ff9d3d12;color:#ffc17e}.icon svg{width:31px;height:31px}.eyebrow{margin:23px 0 8px;color:var(--green);font-size:.76rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase}h1{margin:0;max-width:520px;font-size:clamp(1.9rem,6vw,2.7rem);line-height:1.08;letter-spacing:-.055em}.lead{margin:17px 0 0;color:#d5deea;font-size:1.04rem;line-height:1.7}.notice{display:flex;gap:12px;margin:24px 0 0;padding:15px 16px;border:1px solid #ffffff12;border-radius:13px;background:#ffffff06;color:var(--muted);font-size:.9rem;line-height:1.55}.notice strong{display:block;margin-bottom:3px;color:var(--text)}.notice-mark{color:var(--green);font-size:1.1rem}
+    #accountState{min-height:1.3em;margin-top:14px;color:var(--muted);font-size:.85rem}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}.button{display:inline-flex;justify-content:center;align-items:center;min-height:45px;padding:0 17px;border:1px solid #c8f27965;border-radius:10px;background:#c8f279;color:#14200a;font:inherit;font-weight:800;text-decoration:none;cursor:pointer;transition:transform .15s,background .15s}.button:hover{transform:translateY(-1px);background:#d8ff91}.button.secondary{border-color:#ffffff24;background:#ffffff08;color:var(--text)}.button.secondary:hover{background:#ffffff12}.foot{margin:18px 5px 0;color:#738196;font-size:.77rem;text-align:center}.foot span{color:#aab7c8}
+    @media(max-width:480px){body{padding:17px}.card{border-radius:19px}.actions{display:grid}.button{width:100%}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
 </head>
 <body>
-
-<div class="matrix" id="matrix"></div>
-
-<div class="ban-message">
-  <h1>SERVER BANNUNG</h1>
-  <p>Dein Konto wurde von unserem System gebannt.</p>
-  <p>Falls dies ein Fehler ist, kontaktiere den Administrator.</p>
-  <div class="subtext">– GoalNewsDE Security System –</div>
-</div>
-
-<script>
-  const matrix = document.getElementById('matrix');
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=<>?';
-  
-  function randomChar() {
-    return chars[Math.floor(Math.random() * chars.length)];
-  }
-
-  function createSpan() {
-    const span = document.createElement('span');
-    span.textContent = randomChar();
-    span.style.left = Math.random() * 100 + 'vw';
-    span.style.animationDuration = (2 + Math.random() * 3) + 's';
-    span.style.fontSize = (12 + Math.random()*18) + 'px';
-    matrix.appendChild(span);
-
-    setTimeout(() => {
-      span.remove();
-    }, 4000);
-  }
-
-  setInterval(createSpan, 50);
-</script>
-
-  <script src="beta-banner.js"></script>
+  <main class="shell">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">GN</span>GoalNews</div>
+    <section class="card" aria-labelledby="pageTitle">
+      <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5 19 6v5.2c0 4.4-2.8 7.5-7 9.3-4.2-1.8-7-4.9-7-9.3V6l7-2.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 8v4.7m0 3h.01" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></div>
+      <p class="eyebrow">Kontostatus</p>
+      <h1 id="pageTitle">Dieses Konto ist gesperrt</h1>
+      <p class="lead">Du kannst GoalNews-Seiten weiterhin ansehen. Wenn du GoalNews wieder mit einem Konto nutzen möchtest, musst du dieses gesperrte Konto löschen und anschließend ein neues erstellen.</p>
+      <div class="notice"><span class="notice-mark" aria-hidden="true">ⓘ</span><div><strong>Was passiert beim Löschen?</strong>Dein Firebase-Anmeldekonto und dein GoalNews-Profil werden gelöscht. Eine Löschanfrage mit Zeitpunkt und Konto-ID wird im Admin-PC protokolliert.</div></div>
+      <div id="accountState" role="status" aria-live="polite">Kontostatus wird geprüft …</div>
+      <div class="actions"><button class="button" id="deleteAccountButton" type="button" disabled>Konto löschen und neues erstellen</button><a class="button secondary" href="index.html">Weiter zu GoalNews</a><button class="button secondary" id="signOutButton" type="button">Abmelden</button></div>
+    </section>
+    <p class="foot">GoalNews <span>· Fair bleiben. Gemeinsam Fußball erleben.</span></p>
+  </main>
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    const firebaseConfig={apiKey:"AIzaSyBmIcdFtxv4jBJKdiAkEiwnkQ8yRwiG_0w",authDomain:"goalnewsde-community.firebaseapp.com",projectId:"goalnewsde-community",storageBucket:"goalnewsde-community.firebasestorage.app",messagingSenderId:"134523022055",appId:"1:134523022055:web:4f35ed7812d06e4fb55042"};
+    const app=getApps().length?getApp():initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),state=document.getElementById("accountState"),button=document.getElementById("signOutButton"),deleteButton=document.getElementById("deleteAccountButton");
+    let deleteAllowed=false;
+    onAuthStateChanged(auth,async user=>{
+      deleteAllowed=false;deleteButton.disabled=true;
+      if(!user){state.textContent="Du bist abgemeldet. Melde dich an, um den Kontostatus zu prüfen.";button.textContent="Zum Login";button.onclick=()=>location.href="login.html";return;}
+      try{const profileRef=doc(db,"users",user.uid),requestRef=doc(db,"accountDeletionLogs",user.uid),[profile,request]=await Promise.all([getDoc(profileRef),getDoc(requestRef)]);if((profile.exists()&&profile.data().banned===true)||request.exists()){deleteAllowed=true;deleteButton.disabled=false;state.textContent=request.exists()?`Löschvorgang für ${user.email||"dein Konto"} kann fortgesetzt werden.`:`Angemeldet als ${user.email||"GoalNews-Nutzer"} · Konto gesperrt.`;}else{location.replace("index.html");}}
+      catch(error){console.error("Kontostatus konnte nicht geladen werden",error);state.textContent="Der Kontostatus konnte gerade nicht bestätigt werden. Bitte lade die Seite erneut oder melde dich ab.";}
+    });
+    deleteButton.addEventListener("click",async()=>{
+      const user=auth.currentUser;if(!user||!deleteAllowed)return;
+      if(!confirm("Möchtest du dein gesperrtes GoalNews-Konto wirklich löschen? Danach kannst du ein neues Konto erstellen."))return;
+      deleteButton.disabled=true;state.textContent="Löschvorgang wird ausgeführt …";
+      try{
+        const profileRef=doc(db,"users",user.uid),requestRef=doc(db,"accountDeletionLogs",user.uid);
+        const [profile,request]=await Promise.all([getDoc(profileRef),getDoc(requestRef)]);
+        if(profile.exists()&&profile.data().banned!==true&&!request.exists()){location.replace("index.html");return;}
+        if(!request.exists()){
+          await setDoc(requestRef,{uid:user.uid,email:user.email||"",username:profile.exists()?(profile.data().username||""):"",createdAt:serverTimestamp(),status:"self_delete_requested"});
+        }
+        if(profile.exists())await deleteDoc(profileRef);
+        await deleteUser(user);
+        location.replace("register.html?accountDeleted=1");
+      }catch(error){
+        console.error("Selbstlöschung fehlgeschlagen",error);
+        const recent=error.code==="auth/requires-recent-login";
+        state.textContent=recent?"Bitte melde dich ab und direkt erneut an. Danach kannst du die Löschung fortsetzen.":`Löschung fehlgeschlagen: ${error.message||"Unbekannter Fehler"}`;
+        deleteButton.disabled=false;
+      }
+    });
+    button.addEventListener("click",async()=>{button.disabled=true;try{await signOut(auth);location.href="login.html";}catch(error){console.error(error);state.textContent="Abmelden war nicht möglich. Bitte versuche es erneut.";button.disabled=false;}});
+  </script>
 </body>
 </html>
