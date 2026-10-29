@@ -67,18 +67,23 @@
       .favorite-game-notice p { margin: 0; color: #d5e9db; }
       .favorite-game-notice a { display: inline-block; margin-top: 8px; color: #d8ff91; font-weight: 700; }
       @media (max-width: 700px) { .favorite-game-notice { margin: 18px 14px; } }
-      .football-overview { width: min(1180px, calc(100% - 32px)); margin: 30px auto; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 18px; }
+      .football-overview { width: min(1180px, calc(100% - 32px)); margin: 30px auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
       .football-panel { overflow: hidden; border: 1px solid #ffffff1c; border-radius: 16px; background: #101a29; color: #f4f7fb; box-shadow: 0 16px 40px #0003; text-align: left; }
       .football-panel h2 { margin: 0; padding: 17px 19px; border-bottom: 1px solid #ffffff12; font-size: 1.05rem; }
-      .upcoming-list { display: grid; gap: 8px; padding: 12px; }
-      .upcoming-match { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 13px; align-items: center; padding: 12px; border: 1px solid #ffffff0e; border-radius: 11px; background: #ffffff05; }
-      .upcoming-date { color: #c8f279; font-size: .78rem; font-weight: 750; line-height: 1.45; }
-      .upcoming-teams { font-weight: 650; }
-      .upcoming-result { margin-top: 4px; color: #aab7c8; font-size: .8rem; }
-      .upcoming-subhead { margin: 10px 14px 0; color: #aab7c8; font-size: .78rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
       .table-links { display: grid; gap: 9px; padding: 0 16px 16px; }
       .panel-link { display: flex; align-items: center; min-height: 46px; padding: 10px 12px; border: 1px solid #c8f27933; border-radius: 10px; background: #c8f2790c; color: #c8f279; font-weight: 700; text-decoration: none; }
       .panel-link:hover, .panel-link:focus-visible { border-color: #c8f27988; background: #c8f27918; text-decoration: none; }
+      .preview-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 19px; border-bottom:1px solid #ffffff12; }
+      .preview-heading h2 { padding:0; border:0; }
+      .preview-heading a { color:#d8ff91; font-size:.8rem; font-weight:750; white-space:nowrap; }
+      .table-preview { padding:8px 14px 14px; }
+      .preview-row { display:grid; grid-template-columns:30px minmax(0,1fr) 44px 48px; gap:8px; align-items:center; min-height:39px; border-bottom:1px solid #ffffff0e; font-size:.82rem; }
+      .preview-row:last-child { border-bottom:0; }
+      .preview-rank { color:#9aa9bc; }
+      .preview-team { min-width:0; overflow:hidden; font-weight:650; text-overflow:ellipsis; white-space:nowrap; }
+      .preview-points { color:#d8ff91; font-weight:800; text-align:right; }
+      .preview-played { color:#9aa9bc; text-align:right; }
+      .preview-labels { color:#8796aa; font-size:.68rem; }
       .data-status { margin: 0; padding: 10px 16px; color: #93a3b8; font-size: .75rem; }
       .schedule-section { width: min(1180px, calc(100% - 32px)); margin: 30px auto; }
       .schedule-section > h2 { text-align: left; }
@@ -115,7 +120,8 @@
         .algorithm-tip { margin: 8px auto 0; max-width: 100%; font-size: .72rem; }
         .match-event { margin-top: 4px; font-size: .72rem; }
       }
-      @media (max-width: 540px) { body > header { min-height: 64px; } .brand-greeting { gap:8px; padding-right:48px; } .logo { font-size:1.2rem; } .user-greeting:not([hidden]) { max-width:calc(100vw - 170px); font-size:.78rem; } #burger.menu { top: 14px; right: 16px; } #breakingNews { width: calc(100% - 24px); } .upcoming-match { grid-template-columns: 82px minmax(0,1fr); gap: 9px; padding: 10px; } }
+      .schedule-page-link { display:inline-flex; margin:4px 16px 14px; padding:9px 12px; border:1px solid #c8f27955; border-radius:9px; color:#d8ff91; font-size:.82rem; font-weight:750; }
+      @media (max-width: 540px) { body > header { min-height: 64px; } .brand-greeting { gap:8px; padding-right:48px; } .logo { font-size:1.2rem; } .user-greeting:not([hidden]) { max-width:calc(100vw - 170px); font-size:.78rem; } #burger.menu { top: 14px; right: 16px; } #breakingNews { width: calc(100% - 24px); } }
     </style>
 
     <!-- PWA -->
@@ -251,6 +257,7 @@
           <li><a href="bundesliga.html">Bundesliga</a></li>
           <li><a href="2liga.html">2. Bundesliga</a></li>
           <li><a href="football.html">Football</a></li>
+          <li><a href="naechste-spieltage.html">Nächste Spieltage</a></li>
           <li><a href="freunde.html">Freunde &amp; Spieltipps</a></li>
           <li><a href="verein-news.html">Mein Verein · Updates</a></li>
           <li><a href="lieblingsspieler.html">Lieblingsspieler · Bundesliga</a></li>
@@ -292,25 +299,15 @@
       <a href="bewertungen.html">Bewertung hinterlassen&nbsp; ↗</a>
     </aside>
 
-    <section class="football-overview" aria-label="Kommende Spiele und Tabellenlinks">
+    <section class="football-overview table-preview-grid" aria-label="Vorschau der ersten fünf Teams beider Tabellen">
       <article class="football-panel">
-        <h2>Die nächsten Spiele</h2>
-        <h3 class="upcoming-subhead">1. Bundesliga</h3>
-        <div class="upcoming-list" id="upcomingMatches"><p class="ticker-empty">Spielplan wird geladen …</p></div>
-        <h3 class="upcoming-subhead">2. Bundesliga</h3>
-        <div class="upcoming-list" id="upcomingMatchesBl2"><p class="ticker-empty">Spielplan wird geladen …</p></div>
-        <p class="data-status" id="scheduleStatus">Datenquelle: OpenLigaDB</p>
+        <div class="preview-heading"><h2>Bundesliga</h2><a href="bundesliga.html">Ganze Tabelle ↗</a></div>
+        <div class="table-preview" id="tablePreview-bl1"><p class="ticker-empty">Tabelle wird geladen …</p></div>
       </article>
-      <div style="display:grid;gap:18px">
-        <article class="football-panel table-links-panel">
-          <h2>Tabellen</h2>
-          <p class="data-status">Alle Platzierungen und Statistiken auf den Ligaseiten:</p>
-          <div class="table-links">
-            <a class="panel-link" href="bundesliga.html">1. Bundesliga · komplette Tabelle&nbsp; ↗</a>
-            <a class="panel-link" href="2liga.html">2. Bundesliga · komplette Tabelle&nbsp; ↗</a>
-          </div>
-        </article>
-      </div>
+      <article class="football-panel">
+        <div class="preview-heading"><h2>2. Bundesliga</h2><a href="2liga.html">Ganze Tabelle ↗</a></div>
+        <div class="table-preview" id="tablePreview-bl2"><p class="ticker-empty">Tabelle wird geladen …</p></div>
+      </article>
     </section>
     <p class="data-status" style="text-align:center">Fußballdaten: <a href="https://www.openligadb.de/" target="_blank" rel="noopener noreferrer">OpenLigaDB</a> · <a href="https://www.openligadb.de/lizenz" target="_blank" rel="noopener noreferrer">ODbL 1.0</a></p>
 
@@ -319,6 +316,7 @@
       <h2>1. und 2. Bundesliga: Liveticker</h2>
       <p class="data-status">Letzte 12 Endergebnisse, laufende Spiele und bis zu 12 kommende Partien · automatische Aktualisierung.</p>
       <p class="data-status">Für kommende Spiele zeigt der Algorithmus-Tipp eine unverbindliche Schätzung anhand der aktuellen Tabellenwerte.</p>
+      <a class="schedule-page-link" href="naechste-spieltage.html">Alle nächsten Spieltage ansehen&nbsp; ↗</a>
       <table class="matches-table">
         <thead>
           <tr>
@@ -348,7 +346,7 @@
     <!-- Scripts -->
     <script type="module">
       // ===== Firebase & Live Games Setup =====
-      import { fetchJsonCached, currentSeasonStart, formatUpdatedAt } from "./data-cache.js";
+      import { fetchJsonCached, currentSeasonStart } from "./data-cache.js";
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
       import {
         getFirestore,
@@ -507,8 +505,6 @@
 
       // ===== Live Games Rendering =====
       const tableBody = document.getElementById("tableBody");
-      const upcomingMatches = document.getElementById("upcomingMatches");
-      const scheduleStatus = document.getElementById("scheduleStatus");
       const breakingNewsWrapper = document.querySelector("#breakingNews .news-wrapper");
       const season = currentSeasonStart();
       const leagueTables = new Map();
@@ -517,13 +513,36 @@
         bl2: `https://api.openligadb.de/getmatchdata/bl2/${season}`,
       };
       let latestMatches = [];
-      let matchesLoadedAt = 0;
 
       function setMessage(container, message, className = "ticker-empty") {
         const paragraph = document.createElement("p");
         paragraph.className = className;
         paragraph.textContent = message;
         container.replaceChildren(paragraph);
+      }
+
+      function renderTablePreview(league) {
+        const container = document.getElementById(`tablePreview-${league}`);
+        const teams = (leagueTables.get(league) || []).slice(0, 5);
+        if (!teams.length) {
+          setMessage(container, "Tabellendaten momentan nicht verfügbar.");
+          return;
+        }
+        container.replaceChildren();
+        const labels = document.createElement("div");
+        labels.className = "preview-row preview-labels";
+        for (const value of ["Platz", "Verein", "Sp.", "Pkt."]) {
+          const cell = document.createElement("span"); cell.textContent = value; labels.appendChild(cell);
+        }
+        container.appendChild(labels);
+        teams.forEach((team, index) => {
+          const row = document.createElement("div"); row.className = "preview-row";
+          const rank = document.createElement("span"); rank.className = "preview-rank"; rank.textContent = String(index + 1);
+          const name = document.createElement("span"); name.className = "preview-team"; name.textContent = team.teamName || "Unbekannter Verein";
+          const played = document.createElement("span"); played.className = "preview-played"; played.textContent = String(team.matches ?? "–");
+          const points = document.createElement("span"); points.className = "preview-points"; points.textContent = String(team.points ?? "–");
+          row.append(rank, name, played, points); container.appendChild(row);
+        });
       }
 
       async function loadLeaguePreviews() {
@@ -536,37 +555,6 @@
             leagueTables.set(league, []);
           }
         }));
-      }
-
-      function renderUpcoming(matches, container) {
-        const now = Date.now();
-        const next = matches
-          .filter(match => new Date(match.matchDateTime).getTime() >= now)
-          .sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime))
-          .slice(0, 6);
-        if (!next.length) {
-          setMessage(container, "Für diese Saison sind derzeit keine kommenden Spiele eingetragen.");
-          return;
-        }
-        const fragment = document.createDocumentFragment();
-        next.forEach(match => {
-          const card = document.createElement("div");
-          card.className = "upcoming-match";
-          const date = document.createElement("span");
-          date.className = "upcoming-date";
-          date.textContent = new Date(match.matchDateTime).toLocaleString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-          const details = document.createElement("div");
-          const teams = document.createElement("div");
-          teams.className = "upcoming-teams";
-          teams.textContent = `${match.team1?.teamName || "TBD"} – ${match.team2?.teamName || "TBD"}`;
-          const group = document.createElement("div");
-          group.className = "upcoming-result";
-          group.textContent = match.group?.groupName || "Bundesliga";
-          details.append(teams, group);
-          card.append(date, details);
-          fragment.appendChild(card);
-        });
-        container.replaceChildren(fragment);
       }
 
       function renderBreakingNews(matches) {
@@ -685,17 +673,14 @@
       async function loadBundesligaMatches(force = false) {
         try {
           await loadLeaguePreviews();
+          renderTablePreview("bl1");
+          renderTablePreview("bl2");
           const [firstLeague, secondLeague] = await Promise.all([
             fetchJsonCached(seasonMatchesUrls.bl1, { ttlMs: 5 * 60 * 1000, force }),
             fetchJsonCached(seasonMatchesUrls.bl2, { ttlMs: 5 * 60 * 1000, force }),
           ]);
           latestMatches = [...firstLeague.data, ...secondLeague.data];
           renderBreakingNews(latestMatches);
-          matchesLoadedAt = Math.min(firstLeague.updatedAt, secondLeague.updatedAt);
-          renderUpcoming(firstLeague.data, upcomingMatches);
-          renderUpcoming(secondLeague.data, document.getElementById("upcomingMatchesBl2"));
-          const stale = firstLeague.stale || secondLeague.stale;
-          scheduleStatus.textContent = `Saison ${season}/${season + 1} · Stand ${formatUpdatedAt(matchesLoadedAt)}${stale ? " · gespeicherter Stand (API nicht erreichbar)" : ""}`;
           const now = Date.now();
           const orderedMatches = [...latestMatches].sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime));
           const liveMatches = orderedMatches.filter(match => {
@@ -719,9 +704,8 @@
         } catch (error) {
           console.error("Bundesliga-Spiele konnten nicht geladen werden:", error);
           if (!latestMatches.length) setMessage(tableBody, "Spieldaten momentan nicht erreichbar. Bitte später erneut laden.", "error-state");
-          setMessage(upcomingMatches, "Der Spielplan ist momentan nicht erreichbar.", "error-state");
-          setMessage(document.getElementById("upcomingMatchesBl2"), "Der Spielplan ist momentan nicht erreichbar.", "error-state");
-          scheduleStatus.textContent = "Keine gespeicherten Spieldaten verfügbar";
+          renderTablePreview("bl1");
+          renderTablePreview("bl2");
         }
       }
 
