@@ -1,144 +1,38 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1421">
-  <meta name="description" content="Willkommen bei der GoalNews Beta. Teste neue Funktionen und hilf uns mit deinem Feedback.">
-  <title>GoalNews Beta – Willkommen</title>
+  <meta name="theme-color" content="#080f1b">
+  <title>GoalNews Beta – Phase beendet</title>
   <style>
-    :root { color-scheme: dark; --bg:#080f1b; --panel:#101a29; --line:#ffffff18; --text:#f4f7fb; --muted:#aab7c8; --lime:#c8f279; --lime2:#d8ff91; }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; color:var(--text); background:radial-gradient(ellipse at 50% -15%,#17365a 0,transparent 48%),var(--bg); font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-    a { color:inherit; }
-    .wrap { width:min(1060px,calc(100% - 36px)); margin:0 auto; }
-    .topline { display:flex; justify-content:space-between; align-items:center; padding:21px 0; color:#dce6f1; font-size:.92rem; }
-    .brand { font-weight:850; letter-spacing:-.04em; font-size:1.2rem; }
-    .brand span { color:var(--lime); }
-    .label { display:inline-flex; align-items:center; gap:8px; padding:7px 11px; border:1px solid #c8f27955; border-radius:999px; color:var(--lime2); background:#c8f27910; font-size:.75rem; font-weight:800; letter-spacing:.09em; }
-    .pulse { width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px #c8f27999; }
-    .hero { position:relative; overflow:hidden; margin:22px 0 20px; padding:clamp(28px,6vw,64px); border:1px solid var(--line); border-radius:26px; background:linear-gradient(135deg,#14253a 0%,#101a29 58%,#111c2b 100%); box-shadow:0 24px 70px #0005; }
-    .hero:after { content:""; position:absolute; width:280px;height:280px;right:-100px;top:-120px;border-radius:50%;background:#c8f27912;filter:blur(2px);pointer-events:none; }
-    .eyebrow { margin:0 0 13px; color:var(--lime); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
-    h1 { max-width:760px; margin:0; font-size:clamp(2.2rem,6vw,4.6rem); letter-spacing:-.055em; line-height:1.02; }
-    h1 span { color:var(--lime); }
-    .intro { max-width:690px; margin:20px 0 0; color:#c5d0de; font-size:clamp(1rem,2vw,1.13rem); line-height:1.7; }
-    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:29px; }
-    .button { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:49px; padding:0 19px; border:1px solid transparent; border-radius:12px; text-decoration:none; font-weight:800; transition:transform .16s,filter .16s,background .16s; }
-    .button:hover { transform:translateY(-2px); filter:brightness(1.06); }
-    .primary { color:#12200e; background:linear-gradient(110deg,#d8ff91,#a9df59); box-shadow:0 10px 24px #a5d83d24; }
-    .secondary { color:#e7edf4; border-color:#ffffff25; background:#ffffff08; }
-    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:16px 0; }
-    .card { padding:21px; border:1px solid var(--line); border-radius:17px; background:linear-gradient(145deg,#142235,#101a29); }
-    .icon { display:grid; place-items:center; width:38px;height:38px;margin-bottom:14px;border:1px solid #c8f27935;border-radius:11px;color:var(--lime2);background:#c8f2790e;font-size:1.1rem; }
-    .card h2 { margin:0 0 8px; font-size:1rem; }
-    .card p { margin:0;color:var(--muted);font-size:.91rem;line-height:1.6; }
-    .notice { display:grid; grid-template-columns:auto 1fr; gap:15px; align-items:start; margin:16px 0 24px; padding:20px 22px; border:1px solid #e8b45b55; border-left:4px solid #e8b45b; border-radius:15px; background:linear-gradient(110deg,#e8b45b12,#111b2a 65%); }
-    .notice-icon { font-size:1.25rem; }
-    .notice h2 { margin:0 0 6px; font-size:1rem; }
-    .notice p { margin:0;color:#c9d2dc;font-size:.91rem;line-height:1.65; }
-    .notice strong { color:#f6d69b; }
-    .read-gate { margin:18px 0 28px; padding:22px; border:1px solid #c8f27945; border-radius:17px; background:linear-gradient(145deg,#142235,#101a29); }
-    .read-gate h2 { margin:0 0 8px; font-size:1.1rem; }
-    .read-gate > p { margin:0 0 15px; color:var(--muted); font-size:.91rem; line-height:1.6; }
-    .reading-box { max-height:165px; overflow-y:auto; padding:15px 16px; border:1px solid #ffffff22; border-radius:11px; background:#091321; color:#cbd5e1; line-height:1.65; scrollbar-color:#c8f279 #172335; }
-    .reading-box h3 { margin:0 0 7px; color:var(--lime2); font-size:.95rem; }
-    .reading-box p { margin:0 0 12px; font-size:.88rem; }
-    .confirm-row { display:flex; align-items:flex-start; gap:10px; margin:16px 0; color:#d6e0ea; font-size:.9rem; line-height:1.5; }
-    .confirm-row input { width:18px; height:18px; margin:1px 0 0; accent-color:#a9df59; flex:0 0 auto; }
-    .confirm-row input:disabled { opacity:.5; }
-    .gate-status { min-height:1.4em; margin:0 0 12px !important; color:#9cacbf !important; font-size:.82rem !important; }
-    .launch-button:disabled { opacity:.45; cursor:not-allowed; transform:none; filter:grayscale(.4); box-shadow:none; }
-    footer { padding:26px 0 34px; border-top:1px solid #ffffff12; color:#8e9bad; text-align:center; font-size:.88rem; line-height:1.7; }
-    footer strong { color:#d8e2ed; }
-    @media(max-width:760px) { .grid { grid-template-columns:1fr; } .hero { border-radius:20px; } }
-    @media(max-width:480px) { .wrap { width:min(100% - 24px,1060px); } .topline { padding:15px 0; } .label { font-size:.67rem; } .hero { margin-top:12px; padding:27px 21px; } .actions { display:grid; } .button { width:100%; } .notice { padding:17px 15px; } }
+    * { box-sizing: border-box; }
+    body { display: grid; min-height: 100vh; margin: 0; padding: 24px; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #17365a 0, transparent 48%), #080f1b; color: #f4f7fb; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .notice { position: relative; isolation: isolate; overflow: hidden; width: min(760px, 100%); padding: clamp(36px, 8vw, 76px) clamp(24px, 7vw, 64px); border: 1px solid #c8f27966; border-radius: 28px; background: radial-gradient(ellipse at 15% 0%, #c8f27920, transparent 48%), linear-gradient(135deg, #142233, #0b1421 70%); text-align: center; box-shadow: 0 24px 80px #0008, 0 0 55px #c8f27914; animation: rise .85s cubic-bezier(.2,.8,.2,1) both; }
+    .notice::before, .notice::after { position: absolute; z-index: -1; width: 220px; height: 220px; border: 1px solid #c8f27925; border-radius: 50%; content: ""; animation: orbit 16s linear infinite; }
+    .notice::before { top: -130px; left: -80px; } .notice::after { right: -100px; bottom: -155px; animation-direction: reverse; }
+    .badge { display: inline-flex; align-items: center; gap: 10px; padding: 9px 15px; border: 1px solid #c8f27955; border-radius: 999px; background: #c8f27912; color: #d8ff91; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .badge i { width: 9px; height: 9px; border-radius: 50%; background: #c8f279; box-shadow: 0 0 0 0 #c8f27988; animation: pulse 1.8s infinite; }
+    h1 { margin: 25px 0 14px; font-size: clamp(2.2rem, 8vw, 4.8rem); letter-spacing: -.065em; line-height: .98; }
+    h1 span { display: block; margin-top: 9px; color: #d8ff91; }
+    p { max-width: 540px; margin: 0 auto; color: #b8c7d9; font-size: clamp(1rem, 2.8vw, 1.15rem); line-height: 1.7; }
+    .server-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; margin-top: 26px; padding: 0 22px; border-radius: 13px; background: #c8f279; color: #142019; font-weight: 850; text-decoration: none; box-shadow: 0 10px 28px #c8f2792b; transition: transform .2s, box-shadow .2s; }
+    .server-link:hover, .server-link:focus-visible { transform: translateY(-3px); box-shadow: 0 14px 35px #c8f27955; }
+    .more-info { display: block; margin-top: 18px; color: #8292a6; font-size: .86rem; }
+    @media (prefers-reduced-motion: reduce) { .server-link { transition: none; } }
+    @keyframes pulse { 70% { box-shadow: 0 0 0 10px #c8f27900; } 100% { box-shadow: 0 0 0 0 #c8f27900; } }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topline">
-      <div class="brand">Goal<span>News</span></div>
-      <div class="label"><i class="pulse" aria-hidden="true"></i> BETA-PHASE</div>
-    </div>
-
-    <main>
-      <section class="hero">
-        <p class="eyebrow">Früher dabei. Gemeinsam besser.</p>
-        <h1>Willkommen bei der<br><span>GoalNews Beta.</span></h1>
-        <p class="intro">Schön, dass du beim Testen dabei bist! Hier probierst du neue und überarbeitete Funktionen aus, bevor sie für alle bereitstehen. Dein Feedback hilft unserem Entwicklerteam, GoalNews weiter zu verbessern.</p>
-        <div class="actions">
-          <a class="button primary" href="#beta-lesen">Hinweise lesen und starten <span aria-hidden="true">↓</span></a>
-          <a class="button secondary" href="feedback.html">Einen Bug melden</a>
-        </div>
-      </section>
-
-      <section class="grid" aria-label="Informationen zur Beta">
-        <article class="card">
-          <div class="icon" aria-hidden="true">⚙</div>
-          <h2>Was ist die Beta?</h2>
-          <p>Eine Testversion von GoalNews. Einzelne Bereiche können noch unfertig sein, sich ändern oder Fehler enthalten. Das ist während der Testphase normal.</p>
-        </article>
-        <article class="card">
-          <div class="icon" aria-hidden="true">🐞</div>
-          <h2>Fehler gefunden?</h2>
-          <p>Bitte melde Bugs mit einer kurzen Beschreibung: Was hast du gemacht, was ist passiert und was hättest du erwartet? So können wir den Fehler leichter nachstellen.</p>
-        </article>
-        <article class="card">
-          <div class="icon" aria-hidden="true">💬</div>
-          <h2>Dein Feedback zählt</h2>
-          <p>Auch Ideen und Hinweise zu Bedienung, Darstellung oder neuen Funktionen sind willkommen. Danke, dass du dir Zeit fürs Testen nimmst.</p>
-        </article>
-      </section>
-
-      <aside class="notice" aria-label="Wichtiger Datenbankhinweis">
-        <div class="notice-icon" aria-hidden="true">⚠️</div>
-        <div>
-          <h2>Bitte vor dem Testen beachten</h2>
-          <p>Der Beta-Server verwendet die <strong>echte GoalNews-Datenbank</strong>. Bitte keine privaten oder sensiblen Informationen und keine absichtlichen Test-, Spam- oder unsinnigen Einträge hinterlassen. Änderungen und Einsendungen können für andere Nutzer sichtbar sein.</p>
-        </div>
-      </aside>
-
-      <section class="read-gate" id="beta-lesen" aria-labelledby="read-heading">
-        <h2 id="read-heading">Vor dem Start kurz lesen</h2>
-        <p>Scrolle im Hinweisfeld bis ganz nach unten. Danach kannst du bestätigen und den Beta-Server öffnen.</p>
-        <div class="reading-box" id="readingBox" tabindex="0" aria-label="Beta-Hinweise zum Durchlesen">
-          <h3>Wichtige Beta-Regeln</h3>
-          <p>Du nutzt eine unfertige Testversion. Funktionen und Inhalte können sich ändern oder Fehler enthalten. Bitte melde Fehler über „Einen Bug melden“ und beschreibe möglichst genau, wie sie aufgetreten sind.</p>
-          <p>Der Beta-Server verbindet sich mit der echten GoalNews-Datenbank. Deine Einträge können daher für andere Nutzer sichtbar sein. Erstelle keine absichtlichen Test-, Spam- oder unsinnigen Inhalte und gib keine privaten oder sensiblen Informationen ein.</p>
-          <p>Mit dem Öffnen des Servers bestätigst du, dass du diese Hinweise gelesen hast und beim Testen sorgfältig mit den echten Daten umgehst. Viel Spaß — das GoalNews-Entwicklerteam freut sich auf dein Feedback!</p>
-        </div>
-        <label class="confirm-row"><input id="readConfirm" type="checkbox" disabled><span>Ich habe die Hinweise bis zum Ende gelesen und verstanden.</span></label>
-        <p class="gate-status" id="gateStatus" aria-live="polite">Bitte scrolle im Hinweisfeld bis zum Ende.</p>
-        <button class="button primary launch-button" id="launchBeta" type="button" disabled>Bestätigen und Beta-Server öffnen <span aria-hidden="true">↗</span></button>
-      </section>
-    </main>
-
-    <footer><strong>Viel Spaß beim Testen!</strong><br>Das GoalNews-Entwicklerteam freut sich auf eure Rückmeldungen.<br>Danke, dass ihr helft, GoalNews besser zu machen. ⚽</footer>
-  </div>
-  <script>
-    const readingBox = document.getElementById("readingBox");
-    const readConfirm = document.getElementById("readConfirm");
-    const launchBeta = document.getElementById("launchBeta");
-    const gateStatus = document.getElementById("gateStatus");
-    const betaUrl = "https://eliga99.github.io/GoalNews-Beta/GoalNewsDE%20Beta%20Codes/";
-    let reachedEnd = false;
-
-    readingBox.addEventListener("scroll", () => {
-      if (readingBox.scrollTop + readingBox.clientHeight >= readingBox.scrollHeight - 8) {
-        reachedEnd = true;
-        readConfirm.disabled = false;
-        gateStatus.textContent = "Danke fürs Lesen. Bestätige die Checkbox, um fortzufahren.";
-      }
-    });
-    readConfirm.addEventListener("change", () => {
-      launchBeta.disabled = !(reachedEnd && readConfirm.checked);
-      if (readConfirm.checked) gateStatus.textContent = "Alles klar — du kannst jetzt den Beta-Server öffnen.";
-    });
-    launchBeta.addEventListener("click", () => {
-      if (reachedEnd && readConfirm.checked) window.open(betaUrl, "_blank", "noopener,noreferrer");
-    });
-  </script>
-  <script src="beta-banner.js"></script>
+  <main class="notice" aria-labelledby="title">
+    <div class="badge"><i aria-hidden="true"></i>GoalNews Beta</div>
+    <h1 id="title">Die Beta-Phase <span>ist vorbei.</span></h1>
+    <p>Danke an alle, die GoalNews während der Beta getestet und mit ihrem Feedback geholfen haben. 💚 Die Beta-Phase ist abgeschlossen. Fußball-News, Tabellen und Spieltage findest du weiterhin auf unserem offiziellen Server.</p>
+    <a class="server-link" href="https://goalnews.website/" target="_blank" rel="noopener noreferrer">Zur offiziellen GoalNews-Website <span aria-hidden="true">↗</span></a>
+    <span class="more-info">goalnews.website · Die Beta-Version wird nicht mehr aktualisiert.</span>
+  </main>
 </body>
 </html>
